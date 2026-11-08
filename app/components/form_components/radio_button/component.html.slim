@@ -1,0 +1,22 @@
+.relative.flex.items-start
+  .flex.h-6.items-center
+    input [
+      id=tag_id
+      class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white auto-dark:border-white/10 auto-dark:bg-white/5 checked:border-primary-600 checked:hover:bg-primary-600 checked:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden [&:not(:checked)]:before:hidden hover:ring-primary-600 focus:ring-primary-600 focus:bg-primary-600 checked:focus:bg-primary-600"
+      type="radio"
+      value=tag_value
+      name=name
+      checked=checked?
+      aria-describedby=aria_described_by
+      aria-invalid=aria_invalid
+      *options_for_input_html
+      ]
+  .ml-3.text-sm/6
+    - if label != false
+      div.flex.justify-between
+        = render FormComponents::Label::Component.new(form, object, method, label.presence, value: tag_value)
+    - if description.present?
+      label.text-gray-500.auto-dark:text-gray-400 for=tag_id id=tag_id+"_description"
+        = description
+    - if has_error?
+      p id=tag_id+"_error" class="mt-2 text-sm text-red-600 auto-dark:text-red-400" = all_errors.join(", ")      

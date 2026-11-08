@@ -1,0 +1,4 @@
+label for=tag_id class="block text-sm/6 font-medium text-gray-900 auto-dark:text-white" 
+  = text.presence || human_attribute_name
+  - if required?
+    .fas.fa-asterisk.fa-xs.text-red-500.ml-1
