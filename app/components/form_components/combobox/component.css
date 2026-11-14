@@ -1,0 +1,46 @@
+/* hotwire_combobox's combobox, in the colors of the other form fields */
+.form-component .hw-combobox {
+  --hw-border-color: var(--color-gray-300);
+  --hw-focus-color: var(--color-primary-600);
+  --hw-invalid-color: var(--color-red-600);
+
+  @variant auto-dark {
+    --hw-active-bg-color: var(--color-gray-700);
+    --hw-border-color: rgb(255 255 255 / 0.1);
+    --hw-component-bg-color: rgb(255 255 255 / 0.05);
+    --hw-dialog-label-color: white;
+    --hw-group-bg-color: var(--color-gray-800);
+    --hw-group-color: var(--color-gray-400);
+    --hw-invalid-color: var(--color-red-500);
+    --hw-option-bg-color: var(--color-gray-800);
+    --hw-handle-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+    --hw-handle-image--queried: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18 18 6M6 6l12 12'/%3E%3C/svg%3E");
+    color: white;
+  }
+}
+
+.form-component .hw-combobox__input,
+.form-component .hw-combobox__dialog__input {
+  background-color: transparent;
+  color: inherit;
+}
+
+.form-component .hw-combobox__input::placeholder {
+  color: var(--color-gray-400);
+
+  @variant auto-dark {
+    color: var(--color-gray-500);
+  }
+}
+
+/* On small screens it opens in a dialog */
+.form-component .hw-combobox__dialog {
+  @variant auto-dark {
+    background-color: var(--color-gray-900);
+    color: white;
+
+    &::backdrop {
+      background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 50%, var(--color-gray-900) 50%);
+    }
+  }
+}

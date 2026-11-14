@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- The combobox has the other fields' colors, and a dark mode (`auto-dark`).
+
 ## 0.1.2
 
 - The templates are ERB; slim-rails is no longer a dependency. They render

@@ -26,8 +26,12 @@
         background-position: center;
         background-repeat: no-repeat;
       }
+      /* The components' styles, through Tailwind as in a host, for their auto-dark variants; their imports are linked below */
+      <% %w[color_field combobox].each do |name| %>
+        <%== FormComponents::Engine.root.join("app/components/form_components/#{name}/component.css").read.gsub(/^@import .*$/, "") %>
+      <% end %>
     </style>
-    <%= stylesheet_link_tag "form_components/jscolorpicker/colorpicker", "form_components/color_field/component", "hotwire_combobox" %>
+    <%= stylesheet_link_tag "form_components/jscolorpicker/colorpicker", "hotwire_combobox" %>
     <%= javascript_importmap_tags %>
   </head>
   <body class="bg-gray-50 auto-dark:bg-gray-900">
