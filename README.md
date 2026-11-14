@@ -6,6 +6,12 @@ every type, text areas, check boxes, radio buttons and their collections,
 color and file fields, a submit button and nested forms. Each field has its
 label (marked when the attribute is required), a description, and its errors.
 
+The fields are Rails' own: every helper takes the arguments Rails' form
+builder takes, and renders its input with Rails' helper, so names, ids,
+values, options, hidden fields and nested forms are exactly as with Rails.
+The components add their look and their extras around it. Helpers without a
+component (`select`, `hidden_field`, `range_field`, …) are Rails' as they are.
+
 ## Installation
 
 In the Gemfile:
@@ -32,6 +38,8 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
 ### What the host provides
 
 - A `primary` color in its Tailwind theme (`--color-primary-50` to `-950`).
+- The `@tailwindcss/forms` plugin (`@plugin "@tailwindcss/forms";`), which
+  draws a select's arrow and a checked check box's checkmark.
 - An `auto-dark` variant, for the components' dark mode, so the host decides
   which pages have one. Follow the OS everywhere with:
 
@@ -60,7 +68,7 @@ Instead of the importmap, a bundler resolves these imports to the gem:
   = f.email_field :email, corner_hint: "Optional"
   = f.text_area :body, label: false
   = f.check_box :published
-  = f.collection_radio_buttons :kind, Kind.all, :id, :name, description_method: :hint
+  = f.collection_radio_buttons :kind, Kind.all, :id, :name, {description_method: :hint}, {class: "mine"}
   = f.color_field :color, swatches: ["#e6007e", "#1e40af"], default: "#e6007e"
   = f.file_field :logo, accept: "image/*", preview: @post.logo
   = f.submit
@@ -89,19 +97,47 @@ from it. `builder:` still picks another builder for a form, like
 
 ### Fields
 
-Every field takes `label:` (a text, or false for none) and `description:`.
-The other options go to the input.
+Each helper takes Rails' arguments, and these extras in its options, which
+Rails doesn't get:
 
-- **Text fields**: `text_field`, and `password_field`, `search_field`,
-  `date_field`, `time_field`, `datetime_field`, `datetime_local_field`,
-  `month_field`, `week_field`, `url_field`, `email_field` and `number_field`,
-  with `placeholder:`, `leading_icon:` and `corner_hint:`.
+- **Every field**: `label:` (a text, or false for none) and `description:`,
+  shown below it. A label is Rails' `label`, so its text comes from
+  `helpers.label.<model>.<attribute>` too.
+- **Text fields**: `text_field`, `password_field`, `search_field`,
+  `telephone_field` (`phone_field`), `date_field`, `time_field`,
+  `datetime_field`, `datetime_local_field`, `month_field`, `week_field`,
+  `url_field`, `email_field` and `number_field`, with `leading_icon:` and
+  `corner_hint:`. `text_area` (`textarea`) with `corner_hint:`.
+- **Check boxes and radio buttons**: `check_box` (`checkbox`), with its hidden
+  unchecked value, `multiple:` and the rest as Rails; `radio_button`.
+- **Collections**: `collection_check_boxes` and `collection_radio_buttons` in a
+  fieldset, with the label as its legend and the description and errors once;
+  `description_method:` (a method name or a proc, as `value_method`) gives each
+  item a description of its own. With a block, the block renders the items, as
+  with Rails.
+- **Selects**: `select`, `collection_select`, `grouped_collection_select`,
+  `time_zone_select` and `weekday_select`, as Rails'; the extras go in either
+  hash, `options` or `html_options`. The arrow is `@tailwindcss/forms`'.
+- **Combobox**: `combobox`, [hotwire_combobox](https://hotwirecombobox.com)'s,
+  when the host has that gem, with its arguments; our label replaces its own.
+- **Rating**: `rating_field` gives stars from 1 to `max:` (5), and
+  **scale**: `scale_field` a row of numbers, `in:` (1..5), with `min_label:`
+  and `max_label:` at its ends. Both are Rails' `collection_radio_buttons` of
+  their numbers, so they send a number, or an empty value when none is
+  picked, and need no JS.
 - **Color field**: a color as `#rrggbb`, picked with JS Color Picker by
-  Zygomatic (vendored, MIT). It can be cleared, so empty can mean the default
-  color: `default:` shows it while empty, `swatches:` are colors to pick with
-  one click.
-- **File field**: makes the form multipart; `preview:` is an Active Storage
-  attachment to show above it.
+  Zygomatic (vendored, MIT), with `swatches:` to pick with one click and
+  `default:` shown while it's empty. Unlike Rails' `color_field` it is a text
+  field (Rails' `text_field`, so its name, id and options are Rails'), and it
+  can be cleared: empty stays empty, where Rails sends `#000000`, so it can
+  mean the default color.
+- **File field**: Rails' (which makes the form multipart), with `preview:`, an
+  Active Storage attachment to show above it.
+- **Submit**: Rails' `submit`, named after the record as Rails names it.
+
+A field with errors is wrapped as Rails wraps it
+(`ActionView::Base.field_error_proc`); in a component the wrapper takes no
+place (`.form-component .field_with_errors { display: contents }`).
 
 ### Required fields
 
@@ -141,6 +177,16 @@ bundle install
 bundle exec rake test
 bundle exec standardrb
 ```
+
+The tests run in the dummy app (`test/dummy`), which shows every component on
+one page, and what its form sends:
+
+```sh
+cd test/dummy && bin/rails server
+```
+
+`test/form_builders/rails_parity_test.rb` renders each helper with Rails' own
+form builder and with this one, and compares their form controls.
 
 ## License
 

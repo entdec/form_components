@@ -1,40 +1,33 @@
 module FormComponents
   module Field
+    # A field with a label, a description and its errors around Rails' input
     class Component < FormComponents::Base::Component
-      # String or false, if false, no label will be rendered, if string it will be used as label text
+      self.extras = %i[label description]
+
+      # A text, or false for no label
       option_reader :label
-      # Adds a description below the text field
+      # Shown below the field
       option_reader :description
 
-      def value
-        if respond_to?(:type) && type == :"datetime-local"
-          object.public_send(method)&.localtime(Time.zone)&.strftime("%Y-%m-%dT%H:%M")
-        else
-          object.public_send(method)
-        end
-      end
-
       def has_error?
-        return if object.blank?
-
         all_errors.present?
       end
 
       def all_errors
-        return if object.blank?
+        return [] if object.nil? || !object.respond_to?(:errors)
 
         if /_id$/.match?(method.to_s)
-          object.errors[method].presence || object.errors[method.to_s.gsub(/_id$/, "").to_sym]
+          object.errors[method].presence || object.errors[method.to_s.delete_suffix("_id").to_sym]
         else
           object.errors[method]
         end
       end
 
-      def aria_described_by
+      def aria_described_by(id = tag_id)
         if has_error?
-          tag_id + "_error"
+          "#{id}_error"
         elsif description.present?
-          tag_id + "_description"
+          "#{id}_description"
         end
       end
 
@@ -42,17 +35,23 @@ module FormComponents
         has_error? ? "true" : "false"
       end
 
-      # Returns options hash for a collection item
-      def options_for_collection_item(item)
-        item_options = {}
-        item_options[:label] = item.public_send(value_method) if text_method.present?
-        item_options[:description] = item.public_send(description_method) if description_method.present?
-        options.merge(item_options)
+      # Rails' options with our classes added to the given ones, and the aria
+      # attributes unless given
+      def input_options(classes, id: tag_id, from: html_options)
+        given_aria = from.fetch(:aria, {}).transform_keys(&:to_s)
+        aria = {}
+        aria["aria-invalid"] = aria_invalid unless from.key?(:"aria-invalid") || given_aria.key?("invalid")
+        described_by = aria_described_by(id)
+        aria["aria-describedby"] = described_by if described_by && !from.key?(:"aria-describedby") && !given_aria.key?("describedby")
+        from.merge(class: helpers.class_names(classes, from[:class])).merge(aria)
       end
 
-      # Returns options for HTML input tag
-      def options_for_input_html
-        options.except(:label, :placeholder, :type, :description)
+      # The label of the field's input, unless label: false. With a value, as
+      # Rails' label(method, value:) for a radio button: also its translation.
+      def field_label(id = tag_id, value: nil)
+        return if label == false
+
+        form.label(method, label.presence, {for: id, value: value}.compact)
       end
     end
   end

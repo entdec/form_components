@@ -1,26 +1,13 @@
-.flex.gap-3
+.form-component.flex.gap-3
   .flex.h-6.shrink-0.items-center
     .group.grid.size-4.grid-cols-1
-      - unless is_array?
-        input name=name value=unchecked_value type="hidden" autocomplete="off"
-      input [
-        class="col-start-1 row-start-1 appearance-none rounded border border-gray-300 bg-white auto-dark:border-white/10 auto-dark:bg-white/5 checked:border-primary-600 checked:hover:bg-primary-600 checked:bg-primary-600 indeterminate:border-primary-600 indeterminate:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto hover:ring-primary-600 focus:ring-primary-600 checked:focus:bg-primary-600" 
-        id=tag_id 
-        type="checkbox"
-        name=name
-        checked=checked?
-        value=value
-        aria-describedby=aria_described_by
-        aria-invalid=aria_invalid
-        *options
-        ]
-      .fa-fa-check class="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25" 
+      = input
   .text-sm/6
     - if label != false
       div.flex.justify-between
-        = render FormComponents::Label::Component.new(form, object, method, label.presence, value: (is_array? ? value : nil))
+        = field_label(input_id, value: (checked_value if html_options[:multiple]))
     - if description.present?
-      label for=tag_id class="text-gray-500 auto-dark:text-gray-400" id=tag_id+"_description"
+      label for=input_id class="text-gray-500 auto-dark:text-gray-400" id=input_id+"_description"
         = description
     - if has_error?
-      p id=tag_id+"_error" class="mt-2 text-sm text-red-600 auto-dark:text-red-400" = all_errors.join(", ")      
+      p id=input_id+"_error" class="mt-2 text-sm text-red-600 auto-dark:text-red-400" = all_errors.join(", ")

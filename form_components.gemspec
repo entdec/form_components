@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["tom@degrunt.nl"]
   spec.homepage = "https://github.com/entdec/form_components"
   spec.summary = "A form builder for Rails that renders its fields as Tailwind view components"
-  spec.description = "Text fields, text areas, check boxes, radio buttons, color and file fields, a submit button and nested forms as view components, with their Stimulus controllers and styles, in a Rails engine."
+  spec.description = "Text fields, text areas, check boxes, radio buttons, selects, a combobox, ratings, scales, color and file fields, a submit button and nested forms as view components, with their Stimulus controllers and styles, in a Rails engine."
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2"
 

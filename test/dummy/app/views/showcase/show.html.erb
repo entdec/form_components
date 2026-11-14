@@ -1,0 +1,41 @@
+<h1 class="mb-6 text-2xl font-semibold text-gray-900 auto-dark:text-white">Form components</h1>
+
+<%= form_with model: @post, url: posts_path, builder: FormComponents::FormBuilder, class: "space-y-6" do |f| %>
+  <%= f.text_field :title, placeholder: "A title", description: "Shown on top" %>
+  <%= f.email_field :email, leading_icon: "fas fa-envelope", corner_hint: "Optional" %>
+  <%= f.password_field :password %>
+  <%= f.telephone_field :phone %>
+  <%= f.url_field :website %>
+  <%= f.number_field :count, in: 1..10 %>
+  <%= f.date_field :starts_on %>
+  <%= f.datetime_local_field :starts_at %>
+  <%= f.text_area :body, rows: 3 %>
+  <%= f.check_box :published, description: "Shown on the site" %>
+  <%= f.collection_radio_buttons :kind, Post::KINDS, :first, :second, description_method: :third, description: "One kind" %>
+  <%= f.radio_button :visibility, "public", description: "Anyone can see it" %>
+  <%= f.radio_button :visibility, "private", description: "Only you can see it" %>
+  <%= f.collection_check_boxes :tags, Post::TAGS, :itself, :titleize %>
+  <%= f.select :category, ["News", "Opinion", "Review"], {include_blank: true}, description: "Rails' select" %>
+  <%= f.collection_select :language, Post::LANGUAGES, :first, :second, {prompt: "Pick a language"} %>
+  <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
+  <%= f.combobox :city, Post::CITIES, description: "Type to filter" %>
+  <%= f.rating_field :rating, description: "How good is it?" %>
+  <%= f.scale_field :score, in: 0..10, min_label: "Not likely", max_label: "Very likely", label: "How likely are you to recommend it?" %>
+  <%= f.color_field :color, swatches: ["#e6007e", "#1e40af"], default: "#e6007e" %>
+  <%= f.file_field :logo, accept: "image/*" %>
+  <%= f.nested_form :sections, new_record: Section.new do |nf| %>
+    <% nf.with_item do |sf| %>
+      <div class="section-wrapper" data-new-record="<%= sf.object.new_record? %>">
+        <%= sf.hidden_field :_destroy %>
+        <%= sf.text_field :title %>
+        <button type="button" data-action="form-components--nested-form#remove" class="mt-2 text-sm text-red-600 hover:underline">Remove section</button>
+      </div>
+    <% end %>
+  <% end %>
+  <%= f.submit %>
+<% end %>
+
+<% if @params %>
+  <h2 class="mt-10 mb-2 font-semibold text-gray-900 auto-dark:text-white">Sent</h2>
+  <pre class="overflow-x-auto rounded bg-white p-4 text-xs auto-dark:bg-gray-800 auto-dark:text-gray-100"><%= JSON.pretty_generate(@params) %></pre>
+<% end %>

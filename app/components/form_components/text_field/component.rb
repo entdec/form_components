@@ -1,14 +1,25 @@
 module FormComponents
   module TextField
+    # Rails' text field, or another of its kind (helper: :email_field, …)
     class Component < FormComponents::Field::Component
-      # Dictates the type of input field, e.g. :text, :email, :password, etc.
-      option_reader :type, :text
-      # Adds a placeholder inside the field
-      option_reader :placeholder
-      # Adds a leading icon inside the text field at the start (say: fas fa-envelope)
+      self.extras = superclass.extras + %i[leading_icon corner_hint]
+
+      # Inside the field at its start, e.g. "fas fa-envelope"
       option_reader :leading_icon
-      # Adds a corner hint, next to the label, above the field
+      # Next to the label, above the field
       option_reader :corner_hint
+
+      attr_reader :helper
+
+      # Options given as keywords count as options too
+      def initialize(form, object, method, options = {}, helper: :text_field, **more)
+        super(form, object, method, options.merge(more))
+        @helper = helper
+      end
+
+      def input
+        rails(helper, method, input_options(text_field_classes))
+      end
 
       def text_field_classes
         class_names("block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:placeholder:text-gray-500",

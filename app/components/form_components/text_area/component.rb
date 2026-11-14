@@ -1,10 +1,15 @@
 module FormComponents
   module TextArea
+    # Rails' text area
     class Component < FormComponents::Field::Component
-      # Adds a placeholder inside the field
-      option_reader :placeholder
-      # Adds a corner hint, next to the label, above the field
+      self.extras = superclass.extras + %i[corner_hint]
+
+      # Next to the label, above the field
       option_reader :corner_hint
+
+      def input
+        rails(:text_area, method, input_options(text_area_classes))
+      end
 
       def text_area_classes
         class_names("block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:placeholder:text-gray-500",

@@ -1,2 +1,9 @@
 /* The components' styles (see app/assets/tailwind/form_components/engine.css) */
 @import "../../../components/form_components/color_field/component.css";
+
+/* Rails wraps a field with errors (ActionView::Base.field_error_proc, by
+   default a div.field_with_errors); in a component the wrapper takes no
+   place, so the field stays where the component's layout puts it */
+.form-component .field_with_errors {
+  display: contents;
+}
