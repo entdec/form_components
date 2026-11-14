@@ -1,0 +1,14 @@
+<div class="form-component relative flex items-start">
+  <div class="flex h-6 items-center"><%= input %></div>
+  <div class="ml-3 text-sm/6">
+    <% if label != false %>
+      <div class="flex justify-between"><%= field_label(input_id, value: tag_value) %></div>
+    <% end %>
+    <% if description.present? %>
+      <label class="text-gray-500 auto-dark:text-gray-400" for="<%= input_id %>" id="<%= input_id %>_description"><%= description %></label>
+    <% end %>
+    <% if has_error? %>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= input_id %>_error"><%= all_errors.join(", ") %></p>
+    <% end %>
+  </div>
+</div>

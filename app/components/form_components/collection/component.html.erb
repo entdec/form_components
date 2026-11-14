@@ -1,0 +1,13 @@
+<fieldset <%= tag.attributes("aria-describedby": aria_described_by, class: "form-component") %>>
+  <% if label != false %>
+    <legend class="<%= legend_classes %>"><%= legend %></legend>
+  <% end %>
+  <% if description.present? %>
+    <p class="<%= class_names("text-sm/6 text-gray-500 auto-dark:text-gray-400", "mt-1" => label != false) %>" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <div class="<%= class_names(items_classes, "mt-2" => label != false || description.present?) %>"><%= items %></div>
+  <%= after_items %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+</fieldset>

@@ -9,8 +9,9 @@ module FormComponents
   # get. Helpers without a component here, such as hidden_field or date_select,
   # are Rails'.
   #
-  #   = form_with model: @post, builder: FormComponents::FormBuilder do |f|
-  #     = f.text_field :title
+  #   <%= form_with model: @post, builder: FormComponents::FormBuilder do |f| %>
+  #     <%= f.text_field :title %>
+  #   <% end %>
   class FormBuilder < ActionView::Helpers::FormBuilder
     include FormComponents::ValidationContext
 
@@ -107,13 +108,17 @@ module FormComponents
     # Renders a Stimulus-driven nested form for a has_many association.
     # The block receives the component (nf) so you can declare slots:
     #
-    #   = f.nested_form :sections do |nf|
-    #     - nf.with_item do |sf|
-    #       .section-wrapper data-new-record=sf.object.new_record?.to_s
-    #         = sf.hidden_field :_destroy
-    #         = sf.text_field :title
-    #     - nf.with_add_button
-    #       button type="button" data-action="form-components--nested-form#add" Add section
+    #   <%= f.nested_form :sections do |nf| %>
+    #     <% nf.with_item do |sf| %>
+    #       <div class="section-wrapper" data-new-record="<%= sf.object.new_record? %>">
+    #         <%= sf.hidden_field :_destroy %>
+    #         <%= sf.text_field :title %>
+    #       </div>
+    #     <% end %>
+    #     <% nf.with_add_button do %>
+    #       <button type="button" data-action="form-components--nested-form#add">Add section</button>
+    #     <% end %>
+    #   <% end %>
     #
     # Options (keyword arguments):
     #   placeholder:      – Stimulus token replaced on clone, default "NEW_<SINGULAR>"

@@ -1,0 +1,23 @@
+<div class="form-component">
+  <% if label != false || corner_hint.present? %>
+    <div class="flex justify-between">
+      <%= field_label %>
+      <span class="text-sm/6 text-gray-500 auto-dark:text-gray-400"><%= corner_hint %></span>
+    </div>
+  <% end %>
+  <div class="mt-2 grid grid-cols-1">
+    <%= input %>
+    <% if leading_icon.present? %>
+      <span class="<%= class_names("pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-4", leading_icon) %>"></span>
+    <% end %>
+    <% if has_error? %>
+      <div class="fas fa-circle-exclamation pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4"></div>
+    <% end %>
+  </div>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+</div>

@@ -4,15 +4,19 @@ module FormComponents
   module NestedForm
     # ViewComponent that encapsulates the Stimulus-driven nested-form pattern.
     #
-    # Usage (in a Slim template with a FormComponents::FormBuilder):
+    # Usage (with a FormComponents::FormBuilder):
     #
-    #   = f.nested_form :sections do |nf|
-    #     - nf.with_item do |sf|
-    #       .section-wrapper data-new-record=sf.object.new_record?.to_s
-    #         = sf.hidden_field :_destroy
-    #         = sf.text_field :title
-    #     - nf.with_add_button
-    #       button type="button" data-action="form-components--nested-form#add" Add section
+    #   <%= f.nested_form :sections do |nf| %>
+    #     <% nf.with_item do |sf| %>
+    #       <div class="section-wrapper" data-new-record="<%= sf.object.new_record? %>">
+    #         <%= sf.hidden_field :_destroy %>
+    #         <%= sf.text_field :title %>
+    #       </div>
+    #     <% end %>
+    #     <% nf.with_add_button do %>
+    #       <button type="button" data-action="form-components--nested-form#add">Add section</button>
+    #     <% end %>
+    #   <% end %>
     #
     # The same +with_item+ block is used for both:
     #   • the hidden HTML <template> tag (rendered with a new record so that

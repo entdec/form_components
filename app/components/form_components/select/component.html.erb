@@ -1,0 +1,10 @@
+<div class="form-component">
+  <%= field_label %>
+  <div class="mt-2"><%= input %></div>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+</div>

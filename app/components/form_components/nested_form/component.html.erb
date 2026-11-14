@@ -1,0 +1,19 @@
+<%# Stimulus form-components--nested-form controller:
+    data-form-components--nested-form-placeholder-value      — token replaced with a timestamp on "Add"
+    data-form-components--nested-form-wrapper-selector-value — CSS selector for remove-button scope %>
+<div data-controller="form-components--nested-form" data-form-components--nested-form-placeholder-value="<%= placeholder %>" data-form-components--nested-form-wrapper-selector-value="<%= wrapper_selector %>">
+  <template data-form-components--nested-form-target="template"><%= form.fields_for(method, new_record_object, child_index: placeholder, &item_block) %></template>
+
+  <%# The collection %>
+  <%= form.fields_for(method, &item_block) %>
+
+  <div data-form-components--nested-form-target="insertion"></div>
+
+  <span data-action="click-&gt;form-components--nested-form#add">
+    <% if add_button? %>
+      <%= add_button %>
+    <% else %>
+      <button class="mt-4 inline-flex items-center gap-x-2 rounded-md border border-dashed border-primary-300 px-4 py-3 text-sm font-medium text-primary-600 hover:border-primary-500 hover:bg-primary-50" type="button"><i class="fal fa-plus"></i><span><%= add_label %></span></button>
+    <% end %>
+  </span>
+</div>

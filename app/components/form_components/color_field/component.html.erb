@@ -1,0 +1,10 @@
+<div class="form-component">
+  <%= field_label %>
+  <div <%= tag.attributes(class: class_names("form-color-field mt-2", "form-color-field--error" => has_error?, "form-color-field--default" => default_color), "data-controller": "form-components--color-field", "data-form-components--color-field-swatches-value": swatches.to_json, style: (default_color && "--color-field-default: #{default_color}")) %>><%= input %></div>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+</div>

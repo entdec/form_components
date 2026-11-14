@@ -1,0 +1,16 @@
+<div class="form-component flex gap-3">
+  <div class="flex h-6 shrink-0 items-center">
+    <div class="group grid size-4 grid-cols-1"><%= input %></div>
+  </div>
+  <div class="text-sm/6">
+    <% if label != false %>
+      <div class="flex justify-between"><%= field_label(input_id, value: (checked_value if html_options[:multiple])) %></div>
+    <% end %>
+    <% if description.present? %>
+      <label class="text-gray-500 auto-dark:text-gray-400" for="<%= input_id %>" id="<%= input_id %>_description"><%= description %></label>
+    <% end %>
+    <% if has_error? %>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= input_id %>_error"><%= all_errors.join(", ") %></p>
+    <% end %>
+  </div>
+</div>

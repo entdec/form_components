@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.1.2
+
+- The templates are ERB; slim-rails is no longer a dependency. They render
+  the same HTML as the Slim ones did, apart from whitespace between tags.
+
+## 0.1.1
 
 - Every helper takes Rails' arguments and renders Rails' own input, so
   names, ids, values and options are Rails' (with `index:`, `namespace:`,

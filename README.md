@@ -1,9 +1,10 @@
 # Form components
 
 A form builder for Rails whose fields are view components (ViewComponent,
-Slim, Stimulus, Tailwind CSS v4), as a Rails engine: labels, text fields of
-every type, text areas, check boxes, radio buttons and their collections,
-color and file fields, a submit button and nested forms. Each field has its
+Stimulus, Tailwind CSS v4), as a Rails engine: labels, text fields of every
+type, text areas, check boxes, radio buttons and their collections, selects,
+a combobox, ratings, scales, color and file fields, a submit button and
+nested forms. Each field has its
 label (marked when the attribute is required), a description, and its errors.
 
 The fields are Rails' own: every helper takes the arguments Rails' form
@@ -62,16 +63,19 @@ Instead of the importmap, a bundler resolves these imports to the gem:
 
 ## Usage
 
-```slim
-= form_with model: @post, builder: FormComponents::FormBuilder do |f|
-  = f.text_field :title, placeholder: "A title", description: "Shown on top", leading_icon: "fas fa-heading"
-  = f.email_field :email, corner_hint: "Optional"
-  = f.text_area :body, label: false
-  = f.check_box :published
-  = f.collection_radio_buttons :kind, Kind.all, :id, :name, {description_method: :hint}, {class: "mine"}
-  = f.color_field :color, swatches: ["#e6007e", "#1e40af"], default: "#e6007e"
-  = f.file_field :logo, accept: "image/*", preview: @post.logo
-  = f.submit
+```erb
+<%= form_with model: @post, builder: FormComponents::FormBuilder do |f| %>
+  <%= f.text_field :title, placeholder: "A title", description: "Shown on top", leading_icon: "fas fa-heading" %>
+  <%= f.email_field :email, corner_hint: "Optional" %>
+  <%= f.text_area :body, label: false %>
+  <%= f.check_box :published %>
+  <%= f.collection_radio_buttons :kind, Kind.all, :id, :name, {description_method: :hint}, {class: "mine"} %>
+  <%= f.select :category, Post::CATEGORIES, {include_blank: true}, description: "Where it goes" %>
+  <%= f.rating_field :rating %>
+  <%= f.color_field :color, swatches: ["#e6007e", "#1e40af"], default: "#e6007e" %>
+  <%= f.file_field :logo, accept: "image/*", preview: @post.logo %>
+  <%= f.submit %>
+<% end %>
 ```
 
 ### As the default form builder
@@ -144,23 +148,27 @@ place (`.form-component .field_with_errors { display: contents }`).
 A field's label is marked when its attribute has a presence validator. Pass
 the validation context to the form to count those `on:` it:
 
-```slim
-= form_with model: @post, builder: FormComponents::FormBuilder, validation_context: :publish do |f|
+```erb
+<%= form_with model: @post, builder: FormComponents::FormBuilder, validation_context: :publish do |f| %>
 ```
 
 ### Nested forms
 
 For a has_many association with `accepts_nested_attributes_for`:
 
-```slim
-= f.nested_form :sections do |nf|
-  - nf.with_item do |sf|
-    .section-wrapper data-new-record=sf.object.new_record?.to_s
-      = sf.hidden_field :_destroy
-      = sf.text_field :title
-      button type="button" data-action="form-components--nested-form#remove" Remove
-  - nf.with_add_button
-    button type="button" Add section
+```erb
+<%= f.nested_form :sections do |nf| %>
+  <% nf.with_item do |sf| %>
+    <div class="section-wrapper" data-new-record="<%= sf.object.new_record? %>">
+      <%= sf.hidden_field :_destroy %>
+      <%= sf.text_field :title %>
+      <button type="button" data-action="form-components--nested-form#remove">Remove</button>
+    </div>
+  <% end %>
+  <% nf.with_add_button do %>
+    <button type="button">Add section</button>
+  <% end %>
+<% end %>
 ```
 
 The add button adds a new item from a template, the remove button removes a

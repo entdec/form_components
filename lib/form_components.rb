@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "view_component"
-require "slim-rails"
 require "importmap-rails"
 require "form_components/version"
 require "form_components/engine"
