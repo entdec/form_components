@@ -18,7 +18,7 @@ class TextFieldTest < ComponentTest
     render_inline FormComponents::TextField::Component.new(form(post), post, :title)
 
     assert_select "label[for=post_title] .fa-asterisk"
-    assert_select "input[aria-invalid=true][aria-describedby=post_title_error]"
+    assert_select "input[required][aria-invalid=true][aria-describedby=post_title_error]"
     assert_select "p#post_title_error", text: "can't be blank"
   end
 

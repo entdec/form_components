@@ -17,6 +17,11 @@ module FormComponents
         rails(:check_box, method, input_options(CLASSES, id: input_id), checked_value, unchecked_value)
       end
 
+      # Not one of several, which would each have to be checked
+      def required_attribute?
+        !html_options[:multiple] && super
+      end
+
       # With multiple: true the value is part of the id, as Rails has it
       def input_id
         tag_id(html_options[:multiple] ? checked_value : nil)

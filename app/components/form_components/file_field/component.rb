@@ -12,6 +12,9 @@ module FormComponents
         preview.respond_to?(:attached?) && preview.attached? && preview.blob.persisted? && preview.representable?
       end
 
+      # Not for a file there is already, which isn't sent again
+      def required_attribute? = false
+
       def input
         rails(:file_field, method, input_options(file_field_classes))
       end

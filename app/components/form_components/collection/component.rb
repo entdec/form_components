@@ -40,6 +40,12 @@ module FormComponents
         "space-y-2"
       end
 
+      # Each item's input: a radio button when one has to be chosen, not a
+      # check box, which would each have to be checked
+      def required_attribute?
+        input_helper == :radio_button && super
+      end
+
       # Shown below the items
       def after_items
       end
@@ -51,6 +57,7 @@ module FormComponents
         description = item_description(builder.object)
         aria = {"aria-invalid" => aria_invalid}
         aria["aria-describedby"] = "#{id}_description" if description.present?
+        aria[:required] = true if required_attribute?
         input = builder.public_send(input_helper, aria.merge(class: helpers.class_names(input_classes, item_html_options[:class])))
 
         tag.div(class: "relative flex items-start") do

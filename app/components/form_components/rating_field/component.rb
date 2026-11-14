@@ -24,7 +24,7 @@ module FormComponents
 
       # Its label first, so a star can see the inputs after it
       def item(builder)
-        input = builder.radio_button(class: "sr-only", "aria-invalid": aria_invalid)
+        input = builder.radio_button(class: "sr-only", "aria-invalid": aria_invalid, required: required_attribute? || nil)
         label = builder.label(class: ITEM_CLASSES) do
           safe_join([star, tag.span(builder.text, class: "sr-only")])
         end

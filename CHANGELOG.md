@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- An input whose attribute has a presence validator gets `required`, when
+  the validator's `if:` and `unless:` hold for the record as it is: text
+  fields, text areas, selects, comboboxes, a check box, radio buttons
+  (also as a collection, rating or scale). Not a check box of several, nor a
+  file field. `required: false` leaves it out.
 - The combobox has the other fields' colors, and a dark mode (`auto-dark`).
 
 ## 0.1.2

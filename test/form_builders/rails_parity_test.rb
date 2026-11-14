@@ -4,8 +4,9 @@ require "test_helper"
 
 # Each helper gives the form controls Rails' own builder gives for the same
 # arguments: the same elements, names, ids, values, types and options. Only
-# classes and the aria attributes we add may differ, and our extras (a label,
-# a description, …) are around them.
+# classes, the aria attributes we add and required (of a presence validator,
+# as Post's title has) may differ, and our extras (a label, a description,
+# …) are around them.
 class RailsParityTest < ComponentTest
   EXTRAS = {label: "A label", description: "A description"}.freeze
 
@@ -18,12 +19,19 @@ class RailsParityTest < ComponentTest
     end
   end
 
+  # Ours, without the required Rails' controls don't have
+  def without_added_required(ours, rails)
+    ours.zip(rails).map do |(name, attributes, text), (_, given)|
+      [name, given&.key?("required") ? attributes : attributes.except("required"), text]
+    end
+  end
+
   def assert_parity(helper, *args, post: Post.new, form_options: {}, extras: {}, &block)
     ours = form(post, **form_options).public_send(helper, *ours_args(args, extras), &block)
     rails = rails_form(post, **form_options).public_send(helper, *args, &block)
 
     assert_not_empty controls(rails), "Rails renders no controls for #{helper}"
-    assert_equal controls(rails), controls(ours), "#{helper}(#{args.map(&:inspect).join(", ")})"
+    assert_equal controls(rails), without_added_required(controls(ours), controls(rails)), "#{helper}(#{args.map(&:inspect).join(", ")})"
   end
 
   # Our extras go in the options, which is the last hash Rails takes; they
@@ -197,7 +205,7 @@ class RailsParityTest < ComponentTest
     post.validate
     ours = form(post).text_field(:title)
 
-    assert_equal controls(rails_form(post).text_field(:title)), controls(ours)
+    assert_equal controls(rails_form(post).text_field(:title)), without_added_required(controls(ours), controls(rails_form(post).text_field(:title)))
     assert_includes ours, "field_with_errors"
   end
 end

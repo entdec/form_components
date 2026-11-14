@@ -36,7 +36,7 @@ module FormComponents
       end
 
       def item(builder)
-        input = builder.radio_button(class: "peer sr-only", "aria-invalid": aria_invalid)
+        input = builder.radio_button(class: "peer sr-only", "aria-invalid": aria_invalid, required: required_attribute? || nil)
         tag.div(safe_join([input, builder.label(class: ITEM_CLASSES)]), class: "min-w-0 flex-1")
       end
     end

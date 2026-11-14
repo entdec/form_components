@@ -145,8 +145,13 @@ place (`.form-component .field_with_errors { display: contents }`).
 
 ### Required fields
 
-A field's label is marked when its attribute has a presence validator. Pass
-the validation context to the form to count those `on:` it:
+A field's label is marked when its attribute has a presence validator, and
+its input gets `required`, for the browser to check, when the validator
+holds for the record as it is (its `if:` and `unless:`). Not for a check box
+that is one of several or of a collection, which would each have to be
+checked, nor for a file field, as a file there already isn't sent again.
+`required: false` leaves it out. Pass the validation context to the form to
+count those `on:` it:
 
 ```erb
 <%= form_with model: @post, builder: FormComponents::FormBuilder, validation_context: :publish do |f| %>

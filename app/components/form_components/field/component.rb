@@ -35,11 +35,18 @@ module FormComponents
         has_error? ? "true" : "false"
       end
 
+      # Whether the input gets the required attribute, for the browser to
+      # check: when its attribute must be filled in now (required_now?)
+      def required_attribute?
+        required_now?
+      end
+
       # Rails' options with our classes added to the given ones, and the aria
-      # attributes unless given
+      # attributes and required unless given
       def input_options(classes, id: tag_id, from: html_options)
         given_aria = from.fetch(:aria, {}).transform_keys(&:to_s)
         aria = {}
+        aria[:required] = true if !from.key?(:required) && required_attribute?
         aria["aria-invalid"] = aria_invalid unless from.key?(:"aria-invalid") || given_aria.key?("invalid")
         described_by = aria_described_by(id)
         aria["aria-describedby"] = described_by if described_by && !from.key?(:"aria-describedby") && !given_aria.key?("describedby")
