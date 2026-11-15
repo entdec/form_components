@@ -155,7 +155,7 @@ class FieldsetTest < ComponentTest
   test "its fields in a card, under a heading that is its legend, with a description" do
     render_inline(FormComponents::Fieldset::Component.new("Pricing", description: "What it costs", id: "pricing", class: "mine")) { "<input name=price>".html_safe }
 
-    assert_select "fieldset#pricing.form-fieldset.form-fieldset--above.mine[aria-describedby=pricing_description]"
+    assert_select "fieldset#pricing.form-fieldset.form-fieldset--above.relative.mine[aria-describedby=pricing_description]"
     assert_select "fieldset > legend.sr-only", text: "Pricing"
     assert_select ".form-fieldset__heading [aria-hidden=true]", text: "Pricing"
     assert_select "p#pricing_description", text: "What it costs"

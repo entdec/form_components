@@ -43,7 +43,9 @@ module FormComponents
       def fieldset_options
         classes = {"inside" => CARD_CLASSES, "beside" => "grid gap-x-8 gap-y-4 md:grid-cols-3"}[position.to_s]
         aria = description.present? ? {"aria-describedby": description_id} : {}
-        html_options.merge(aria).merge(class: helpers.class_names("form-fieldset", "form-fieldset--#{position}", classes, html_options[:class]))
+        # Positioned, for its legend (sr-only, absolute) to be placed in it, not in the page, which it could otherwise
+        # make taller
+        html_options.merge(aria).merge(class: helpers.class_names("form-fieldset", "form-fieldset--#{position}", "relative", classes, html_options[:class]))
       end
 
       def body_classes
