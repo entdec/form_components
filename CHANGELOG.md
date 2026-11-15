@@ -9,6 +9,10 @@
   an Action Text attribute. Tiptap is vendored
   (`vendor/javascript/form_components/tiptap.js`, built by
   `script/vendor/build.mjs`).
+- `fieldset` (`field_set`): a group of fields in a card, as Rails'
+  `field_set_tag`, with `description:` and `legend_position:` (`:above`,
+  `:inside`, `:beside`). Also renders without a form
+  (`FormComponents::Fieldset::Component`).
 
 ## 0.1.4
 

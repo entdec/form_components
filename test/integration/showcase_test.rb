@@ -12,6 +12,7 @@ class ShowcaseTest < ActionDispatch::IntegrationTest
       assert_select "[name='#{name}']", {minimum: 1}, name
     end
     assert_select ".section-wrapper [data-action='form-components--nested-form#remove']", minimum: 1
+    assert_select "fieldset.form-fieldset legend", text: "About"
   end
 
   test "the form sends what Rails' fields send" do

@@ -150,3 +150,47 @@ class NestedFormTest < ComponentTest
     assert_select "[data-action='click->form-components--nested-form#add'] button", text: /Add section/
   end
 end
+
+class FieldsetTest < ComponentTest
+  test "its fields in a card, under a heading that is its legend, with a description" do
+    render_inline(FormComponents::Fieldset::Component.new("Pricing", description: "What it costs", id: "pricing", class: "mine")) { "<input name=price>".html_safe }
+
+    assert_select "fieldset#pricing.form-fieldset.form-fieldset--above.mine[aria-describedby=pricing_description]"
+    assert_select "fieldset > legend.sr-only", text: "Pricing"
+    assert_select ".form-fieldset__heading [aria-hidden=true]", text: "Pricing"
+    assert_select "p#pricing_description", text: "What it costs"
+    assert_select ".form-fieldset__body.rounded-xl input[name=price]"
+  end
+
+  test "the heading inside the card, or beside it" do
+    render_inline(FormComponents::Fieldset::Component.new("Status", legend_position: :inside)) { "x" }
+    assert_select "fieldset.form-fieldset--inside.rounded-xl .form-fieldset__heading"
+    assert_select ".form-fieldset__body.rounded-xl", count: 0
+
+    render_inline(FormComponents::Fieldset::Component.new("Profile", legend_position: "beside")) { "x" }
+    assert_select "fieldset.form-fieldset--beside.md\\:grid-cols-3"
+    assert_select ".form-fieldset__body.rounded-xl.md\\:col-span-2"
+  end
+
+  test "without a heading, only the card" do
+    render_inline(FormComponents::Fieldset::Component.new) { "x" }
+
+    assert_select "fieldset:not([aria-describedby]) .form-fieldset__body", text: "x"
+    assert_select "legend, .form-fieldset__heading", count: 0
+  end
+
+  test "no other position" do
+    assert_raises(ArgumentError) { FormComponents::Fieldset::Component.new("A", legend_position: :below) }
+  end
+
+  test "from the form, around its fields" do
+    view = vc_test_controller.view_context
+    f = FormComponents::FormBuilder.new(:post, Post.new, view, {})
+    @rendered_content = f.fieldset("About", legend_position: :inside) { f.text_field(:title) }
+
+    assert_select "fieldset.form-fieldset--inside legend", text: "About"
+    assert_select "fieldset .form-fieldset__body input[name='post[title]']"
+  end
+
+  def rendered_content = @rendered_content || super
+end

@@ -189,6 +189,23 @@ Rails doesn't get:
   Active Storage attachment to show above it.
 - **Submit**: Rails' `submit`, named after the record as Rails names it.
 
+### Fieldsets
+
+`fieldset` (`field_set`) groups fields in a card, as Rails' `field_set_tag`
+(`legend`, `options`), with `description:` and `legend_position:`, where the
+heading goes: `:above` the card (the default), `:inside` it, on its first
+line, or `:beside` it, with the description, in a column of its own on wider
+screens (as settings pages have it). The legend is for screen readers; the
+heading shown is a copy, as a fieldset draws its own legend on its border.
+It's not a field, so it renders in any form, too:
+`render FormComponents::Fieldset::Component.new("Pricing", legend_position: :inside)`.
+
+```erb
+<%= f.fieldset "Pricing", description: "What a sponsor pays" do %>
+  <%= f.text_field :price %>
+<% end %>
+```
+
 A field with errors is wrapped as Rails wraps it
 (`ActionView::Base.field_error_proc`); in a component the wrapper takes no
 place (`.form-component .field_with_errors { display: contents }`).

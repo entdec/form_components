@@ -1,0 +1,16 @@
+<%= tag.fieldset(**fieldset_options) do %>
+  <% if legend.present? %>
+    <legend class="sr-only"><%= legend %></legend>
+  <% end %>
+  <% if heading? %>
+    <div class="form-fieldset__heading">
+      <% if legend.present? %>
+        <div class="<%= self.class::LEGEND_CLASSES %>" aria-hidden="true"><%= legend %></div>
+      <% end %>
+      <% if description.present? %>
+        <p class="<%= class_names(self.class::DESCRIPTION_CLASSES, "mt-1" => legend.present?) %>" id="<%= description_id %>"><%= description %></p>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="<%= body_classes %>"><%= content %></div>
+<% end %>

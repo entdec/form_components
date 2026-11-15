@@ -115,6 +115,13 @@ module FormComponents
       component(:file_field, method, options)
     end
 
+    # A group of fields in a card, see Fieldset: as Rails' field_set_tag,
+    # with description: and legend_position: (:above, :inside, :beside)
+    def fieldset(legend = nil, options = {}, &block)
+      FormComponents::Fieldset::Component.new(legend, options).render_in(@template, &block)
+    end
+    alias_method :field_set, :fieldset
+
     def submit(value = nil, options = {})
       FormComponents::Submit::Component.new(self, @object, value, options).render_in(@template)
     end
