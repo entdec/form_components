@@ -15,6 +15,25 @@ module FormComponents
   class FormBuilder < ActionView::Helpers::FormBuilder
     include FormComponents::ValidationContext
 
+    # Adds a helper to the builder for one of the app's components: the block
+    # gets the helper's arguments and returns the component, run in the
+    # builder (self, object, @template), and the helper renders it, with the
+    # helper's own block as its content. Again for the same name replaces it,
+    # so it can be done in a to_prepare, for components that reload:
+    #
+    #   FormComponents::FormBuilder.register(:image_upload) do |method = :photo, **options|
+    #     ImageUpload::Component.new(form: self, attribute: method, **options)
+    #   end
+    #
+    #   <%= f.image_upload :logo, shape: :square %>
+    def self.register(name, &build)
+      raise ArgumentError, "register :#{name} needs a block that returns the component" unless build
+
+      define_method(name) do |*args, **options, &content|
+        instance_exec(*args, **options, &build).render_in(@template, &content)
+      end
+    end
+
     # Rails' text fields of every kind, as TextField
     TEXT_FIELDS = %i[text_field password_field search_field date_field time_field
       datetime_field datetime_local_field month_field week_field url_field email_field number_field].freeze

@@ -60,3 +60,52 @@ class FormBuilderTest < ComponentTest
     assert_not_includes form(post).file_field(:logo), "required"
   end
 end
+
+class FormBuilderRegisterTest < ComponentTest
+  class Greeting < ViewComponent::Base
+    def initialize(form:, attribute:, greeting: "Hello")
+      @form = form
+      @attribute = attribute
+      @greeting = greeting
+    end
+
+    def call
+      tag.p("#{@greeting}, #{@form.object.public_send(@attribute)}#{content}", id: @form.field_id(@attribute, :greeting))
+    end
+  end
+
+  setup do
+    FormComponents::FormBuilder.register(:greeting) do |method = :title, **options|
+      Greeting.new(form: self, attribute: method, **options)
+    end
+  end
+
+  teardown do
+    FormComponents::FormBuilder.remove_method(:greeting)
+  end
+
+  test "a helper for an app's component, with its arguments, rendered with its block as content" do
+    f = form(Post.new(title: "World", body: "Body"))
+
+    assert_select_in f.greeting, "p#post_title_greeting", text: "Hello, World"
+    assert_select_in f.greeting(:body, greeting: "Hi"), "p#post_body_greeting", text: "Hi, Body"
+    assert_select_in f.greeting { "!" }, "p", text: "Hello, World!"
+  end
+
+  test "registered again, replaced" do
+    FormComponents::FormBuilder.register(:greeting) { |method = :title| Greeting.new(form: self, attribute: method, greeting: "Bye") }
+
+    assert_select_in form(Post.new(title: "World")).greeting, "p", text: "Bye, World"
+  end
+
+  test "needs a block" do
+    assert_raises(ArgumentError) { FormComponents::FormBuilder.register(:greeting) }
+  end
+
+  def assert_select_in(html, selector, **)
+    @rendered_content = html
+    assert_select(selector, **)
+  end
+
+  def rendered_content = @rendered_content || super
+end

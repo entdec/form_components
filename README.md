@@ -210,6 +210,27 @@ A field with errors is wrapped as Rails wraps it
 (`ActionView::Base.field_error_proc`); in a component the wrapper takes no
 place (`.form-component .field_with_errors { display: contents }`).
 
+### The app's own components
+
+`FormComponents::FormBuilder.register` adds a helper for a component of the
+app's: its block gets the helper's arguments and returns the component, and
+runs in the builder (`self`, `object`, `@template`); the helper renders it,
+with its own block as the content. Registering a name again replaces it, so
+it can be done in a `to_prepare`, as the app's components reload:
+
+```ruby
+# config/initializers/form_components.rb
+Rails.application.config.to_prepare do
+  FormComponents::FormBuilder.register(:image_upload) do |method = :photo, **options|
+    ImageUpload::Component.new(form: self, attribute: method, **options)
+  end
+end
+```
+
+```erb
+<%= f.image_upload :logo, shape: :square %>
+```
+
 ### Required fields
 
 A field's label is marked when its attribute has a presence validator, and

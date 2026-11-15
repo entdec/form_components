@@ -13,6 +13,8 @@
   `field_set_tag`, with `description:` and `legend_position:` (`:above`,
   `:inside`, `:beside`). Also renders without a form
   (`FormComponents::Fieldset::Component`).
+- `FormComponents::FormBuilder.register(name) { |*args, **options| component }`
+  adds a helper for one of the app's components.
 
 ## 0.1.4
 
