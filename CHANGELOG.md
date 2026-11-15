@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 0.1.4
+
+- `telephone_field` (`phone_field`) has a country picker, with flags
+  (flag-icons, which the host provides) and a search, and sends the number
+  with the country's calling code (`+31123456789`). `country:` and
+  `priority_countries:`. Its arguments are still Rails'.
 
 - An input whose attribute has a presence validator gets `required`, when
   the validator's `if:` and `unless:` hold for the record as it is: text

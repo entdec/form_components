@@ -50,6 +50,9 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
 
   or keep it off with `@custom-variant auto-dark (&:where(.never-dark, .never-dark *));`
 - [Font Awesome](https://fontawesome.com), for the icons (`fas`, `fal`).
+- [flag-icons](https://flagicons.lipis.dev), for the telephone field's
+  flags (`fi fi-nl`), e.g.
+  `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">`.
 
 ### Bundling with esbuild
 
@@ -108,10 +111,24 @@ Rails doesn't get:
   shown below it. A label is Rails' `label`, so its text comes from
   `helpers.label.<model>.<attribute>` too.
 - **Text fields**: `text_field`, `password_field`, `search_field`,
-  `telephone_field` (`phone_field`), `date_field`, `time_field`,
+  `date_field`, `time_field`,
   `datetime_field`, `datetime_local_field`, `month_field`, `week_field`,
   `url_field`, `email_field` and `number_field`, with `leading_icon:` and
   `corner_hint:`. `text_area` (`textarea`) with `corner_hint:`.
+- **Telephone field**: `telephone_field` (`phone_field`) takes Rails'
+  arguments, with a country picker before the number: a flag and the
+  country's calling code, and a list of countries to search, `priority_countries:`
+  (`%w[nl de be fr gb]`) on top, named in `I18n.locale`. It sends the number
+  with the code, as `+31123456789` (without the national `0`, but Italy's),
+  in a hidden field with Rails' name; the number is typed in Rails'
+  telephone field, with its id and options. A number with a code picks its
+  country, also when typed or pasted (`+44 20…`, `0044 20…`); one without, as
+  a plain field saved it, is shown as it is, with `country:` (`"nl"`). Set
+  the defaults for the app with
+  `FormComponents::TelephoneField::Component.default_country` and
+  `.default_priority_countries`; translate `form_components.telephone_field.country`
+  and `.search`. Like the color field it needs JS; `text_field :phone, type: "tel"`
+  is a plain one. `corner_hint:` as a text field.
 - **Check boxes and radio buttons**: `check_box` (`checkbox`), with its hidden
   unchecked value, `multiple:` and the rest as Rails; `radio_button`.
 - **Collections**: `collection_check_boxes` and `collection_radio_buttons` in a

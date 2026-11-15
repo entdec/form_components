@@ -4,7 +4,7 @@
   <%= f.text_field :title, placeholder: "A title", description: "Shown on top" %>
   <%= f.email_field :email, leading_icon: "fas fa-envelope", corner_hint: "Optional" %>
   <%= f.password_field :password %>
-  <%= f.telephone_field :phone %>
+  <%= f.telephone_field :phone, description: "With its country's code" %>
   <%= f.url_field :website %>
   <%= f.number_field :count, in: 1..10 %>
   <%= f.date_field :starts_on %>

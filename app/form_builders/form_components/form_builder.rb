@@ -16,7 +16,7 @@ module FormComponents
     include FormComponents::ValidationContext
 
     # Rails' text fields of every kind, as TextField
-    TEXT_FIELDS = %i[text_field password_field search_field telephone_field phone_field date_field time_field
+    TEXT_FIELDS = %i[text_field password_field search_field date_field time_field
       datetime_field datetime_local_field month_field week_field url_field email_field number_field].freeze
 
     def label(method, text = nil, options = {}, &block)
@@ -28,6 +28,13 @@ module FormComponents
         component(:text_field, method, options, helper: helper)
       end
     end
+
+    # Rails' arguments, with a country picker: the number is sent with its
+    # country's calling code, see TelephoneField
+    def telephone_field(method, options = {})
+      component(:telephone_field, method, options)
+    end
+    alias_method :phone_field, :telephone_field
 
     def text_area(method, options = {})
       component(:text_area, method, options)

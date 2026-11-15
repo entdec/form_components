@@ -3,7 +3,7 @@
 # Every component on one page, and what the form sends back
 class ShowcaseController < ApplicationController
   def show
-    @post = Post.new(title: "Hello", kind: "news", tags: ["ruby"], color: "#1e40af", sections: [Section.new(title: "Intro")])
+    @post = Post.new(title: "Hello", kind: "news", tags: ["ruby"], color: "#1e40af", phone: "+31123456789", sections: [Section.new(title: "Intro")])
   end
 
   def create

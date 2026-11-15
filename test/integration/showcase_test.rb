@@ -8,7 +8,7 @@ class ShowcaseTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    %w[post[title] post[email] post[body] post[published] post[kind] post[visibility] post[tags][] post[color] post[logo] post[category] post[language] post[time_zone] post[city] post[rating] post[score]].each do |name|
+    %w[post[title] post[email] post[body] post[published] post[kind] post[visibility] post[tags][] post[color] post[phone] post[logo] post[category] post[language] post[time_zone] post[city] post[rating] post[score]].each do |name|
       assert_select "[name='#{name}']", {minimum: 1}, name
     end
     assert_select ".section-wrapper [data-action='form-components--nested-form#remove']", minimum: 1

@@ -153,3 +153,48 @@ class RatingTest < ComponentTest
     assert_select "p#post_rating_error", text: "can't be blank"
   end
 end
+
+class TelephoneFieldTest < ComponentTest
+  def field(phone, **options)
+    Nokogiri::HTML5.fragment(form(Post.new(phone: phone)).telephone_field(:phone, **options))
+  end
+
+  test "the number's country, from its code" do
+    html = field("+32 470 12 34 56")
+    assert_equal "470123456", html.at_css("input[type=tel]")["value"]
+    assert html.at_css("button .fi.fi-be")
+    assert_equal "+32", html.at_css("[data-form-components--telephone-field-target=code]").text
+    assert_equal "+32 470 12 34 56", html.at_css("input[type=hidden]")["value"]
+  end
+
+  test "a code that several countries share: the default's, a priority one's, else the main one's" do
+    assert field("+14165551234").at_css(".fi-us")
+    assert field("+14165551234", country: "ca").at_css(".fi-ca")
+    assert field("+14165551234", priority_countries: %w[ca]).at_css(".fi-ca")
+    assert field("004420 7946 0000").at_css(".fi-gb")
+  end
+
+  test "a number without a code is shown as it is, with the default country" do
+    html = field("0123456789")
+    assert_equal "0123456789", html.at_css("input[type=tel]")["value"]
+    assert html.at_css("button .fi-nl")
+    assert field(nil, country: "DE").at_css("button .fi-de")
+  end
+
+  test "the label is the number's, which is required, and the hidden field isn't" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :phone, presence: true
+    end
+    html = Nokogiri::HTML5.fragment(form(post_class.new).telephone_field(:phone))
+
+    assert html.at_css("label[for=post_phone]")
+    assert html.at_css("input#post_phone[type=tel][required]:not([name])")
+    assert_nil html.at_css("input[type=hidden]")["required"]
+  end
+
+  test "the priority countries, for the controller to put on top" do
+    html = field(nil, priority_countries: %w[NL be xx])
+    assert_equal %w[nl be].to_json, html.at_css("[data-form-components--telephone-field-priority-value]")["data-form-components--telephone-field-priority-value"]
+  end
+end

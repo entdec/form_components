@@ -192,6 +192,22 @@ class RailsParityTest < ComponentTest
     assert_equal "#000000", rails.first[1]["value"]
   end
 
+  test "telephone_field and phone_field: Rails' arguments, name, id and options, the number with its code in a hidden field" do
+    post = Post.new(phone: "+31123456789")
+    [:telephone_field, :phone_field].each do |helper|
+      [[{}, {}], [{placeholder: "x", data: {a: 1}, maxlength: 15, disabled: true}, {}], [{index: 3}, {}], [{id: "custom", name: "other[name]"}, {}], [{}, {namespace: "ns", index: 2}]].each do |options, form_options|
+        ours = controls(form(post, **form_options).public_send(helper, :phone, options.merge(EXTRAS)))
+        rails = controls(rails_form(post, **form_options).public_send(helper, :phone, options)).first[1]
+        hidden = ours.find { |name, attributes| name == "input" && attributes["type"] == "hidden" }[1]
+        tel = ours.find { |name, attributes| name == "input" && attributes["type"] == "tel" }[1]
+
+        assert_equal [rails["name"], "+31123456789"], hidden.values_at("name", "value"), "#{helper}(#{options.inspect})"
+        assert_equal rails.except("name", "value"), tel.except("value", "autocomplete", "data-form-components--telephone-field-target", "data-action"), "#{helper}(#{options.inspect})"
+        assert_equal "123456789", tel["value"]
+      end
+    end
+  end
+
   test "fields_for gives nested fields Rails' names and ids" do
     post = Post.new(sections: [Section.new(title: "Intro")])
     ours = form(post).fields_for(:sections) { |sf| sf.text_field(:title) + sf.check_box(:title) }
