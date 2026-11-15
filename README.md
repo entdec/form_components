@@ -2,9 +2,9 @@
 
 A form builder for Rails whose fields are view components (ViewComponent,
 Stimulus, Tailwind CSS v4), as a Rails engine: labels, text fields of every
-type, text areas, check boxes, radio buttons and their collections, selects,
-a combobox, ratings, scales, color and file fields, a submit button and
-nested forms. Each field has its
+type, text areas, a rich text area (Tiptap), check boxes, radio buttons and
+their collections, selects, a combobox, ratings, scales, color and file
+fields, a submit button and nested forms. Each field has its
 label (marked when the attribute is required), a description, and its errors.
 
 The fields are Rails' own: every helper takes the arguments Rails' form
@@ -115,6 +115,39 @@ Rails doesn't get:
   `datetime_field`, `datetime_local_field`, `month_field`, `week_field`,
   `url_field`, `email_field` and `number_field`, with `leading_icon:` and
   `corner_hint:`. `text_area` (`textarea`) with `corner_hint:`.
+- **Rich text area**: `rich_text_area` (`rich_textarea`) is a
+  [Tiptap](https://tiptap.dev) editor instead of Rails' Trix (vendored, see
+  [Development](#development)), for an Action Text attribute (`has_rich_text`)
+  or one that holds HTML. The HTML is in Rails' `text_area`, with Rails' name,
+  id and options, out of sight: the label points at it, the browser checks it
+  when it's required, and it hands its focus to the editor. `toolbar:` names
+  its buttons, with `:|` between groups, or is `false` for none:
+
+  ```erb
+  <%= f.rich_text_area :content, toolbar: %i[heading | bold italic link | bullet_list ordered_list] %>
+  ```
+
+  The buttons are `heading` (a select of paragraph and headings 1–3), `bold`,
+  `italic`, `underline`, `strike`, `code`, `link` (⌘K), `bullet_list`,
+  `ordered_list`, `blockquote`, `code_block`, `horizontal_rule`,
+  `align_left`, `align_center`, `align_right`, `align_justify`, `image`,
+  `undo` and `redo`; the default is
+  `%i[heading | bold italic underline strike | link | bullet_list ordered_list blockquote | image | undo redo]`,
+  set for the app with `FormComponents::RichTextArea::Component.default_toolbar`.
+  The editor allows only the formatting of its toolbar, also when pasting or
+  typing Markdown. `image` uploads an image, also a pasted or dropped one,
+  with Active Storage's direct uploads, when the host has Active Storage (or
+  as Rails takes them, `data: {direct_upload_url:, blob_url_template:}`); a
+  form submitted while one uploads waits for it. On an Action Text attribute
+  an image is an attachment, as with Trix; elsewhere an `<img>` with the
+  blob's URL. Other attachments an Action Text attribute has from Trix are
+  left out. `placeholder:` shows while it's empty, `class:` is the editor's
+  and `corner_hint:` as a text area; translate the buttons' titles in
+  `form_components.rich_text_area` (`bold`, `bullet_list`, …,
+  `heading_level`, `paragraph`, `url`, `apply`, `remove_link`). Like the
+  color field it needs JS; `upload-error` is dispatched
+  (`form-components--rich-text-area:upload-error`) when an upload fails, with
+  an alert unless it's prevented.
 - **Telephone field**: `telephone_field` (`phone_field`) takes Rails'
   arguments, with a country picker before the number: a flag and the
   country's calling code, and a list of countries to search, `priority_countries:`
@@ -215,10 +248,21 @@ one page, and what its form sends:
 cd test/dummy && bin/rails server
 ```
 
+`/articles/new` there has a rich text area on an Action Text attribute,
+with what it stores and how that renders.
+
 `test/form_builders/rails_parity_test.rb` renders each helper with Rails' own
 form builder and with this one, and compares their form controls.
+
+Tiptap, and Active Storage's `DirectUpload`, are vendored as one ES module,
+`vendor/javascript/form_components/tiptap.js`. To update it:
+
+```sh
+cd script/vendor && npm install && node build.mjs
+```
 
 ## License
 
 MIT, see MIT-LICENSE. JS Color Picker is MIT too, see
-`vendor/javascript/form_components/jscolorpicker/LICENSE`.
+`vendor/javascript/form_components/jscolorpicker/LICENSE`, and so are the
+vendored Tiptap and Active Storage JavaScript.

@@ -198,3 +198,95 @@ class TelephoneFieldTest < ComponentTest
     assert_equal %w[nl be].to_json, html.at_css("[data-form-components--telephone-field-priority-value]")["data-form-components--telephone-field-priority-value"]
   end
 end
+
+class RichTextAreaTest < ComponentTest
+  def field(post = Post.new(notes: "<p>Hi</p>"), method = :notes, **options)
+    Nokogiri::HTML5.fragment(form(post).rich_text_area(method, **options))
+  end
+
+  def data(html, name) = html.at_css("[data-controller]")["data-form-components--rich-text-area-#{name}-value"]
+
+  test "the HTML in Rails' text area, which the label points at, out of sight and handing its focus to the editor" do
+    html = field
+    textarea = html.at_css("textarea#post_notes[name='post[notes]'][tabindex='-1'][aria-hidden=true]")
+
+    assert_equal "<p>Hi</p>", textarea.text
+    assert_includes textarea["data-action"], "focus->form-components--rich-text-area#focus"
+    assert html.at_css("label#post_notes_label[for=post_notes]")
+    assert_equal "post_notes_editor", JSON.parse(data(html, "attributes"))["id"]
+    assert_equal "post_notes_label", JSON.parse(data(html, "attributes"))["aria-labelledby"]
+  end
+
+  test "the default toolbar, with the image button when the host has Active Storage" do
+    html = field
+
+    assert html.at_css("[role=toolbar] select[data-form-components--rich-text-area-target=heading]")
+    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    assert_equal 5, html.css("[role=toolbar] > span[aria-hidden]").size
+    assert_equal FormComponents::RichTextArea::Component.default_toolbar.without(:|).map(&:to_s), JSON.parse(data(html, "toolbar"))
+    assert_equal "http://test.host/rails/active_storage/direct_uploads", data(html, "direct-upload-url")
+    assert html.at_css("input[type=file][accept='image/*']")
+  end
+
+  test "a toolbar of its own, without separators at the ends or next to each other, or none" do
+    html = field(toolbar: %i[| bold | | code_block align_center |])
+
+    assert_equal %w[bold code_block align_center], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    assert_equal 1, html.css("[role=toolbar] > span[aria-hidden]").size
+    assert_nil html.at_css("[data-form-components--rich-text-area-target=linkMenu]")
+    assert_nil field(toolbar: false).at_css("[role=toolbar]")
+    assert_raises(ArgumentError) { field(toolbar: %i[bold blink]) }
+  end
+
+  test "no image button nor uploads without a direct upload URL" do
+    html = field(toolbar: %i[bold image], data: {direct_upload_url: nil})
+
+    assert_equal %w[bold], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    assert_nil data(html, "direct-upload-url")
+    assert_nil html.at_css("input[type=file]")
+  end
+
+  test "required: the text area, for the browser to check, and the editor" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :notes, presence: true
+    end
+
+    html = field(post_class.new)
+    assert html.at_css("textarea[required]")
+    assert_equal "true", JSON.parse(data(html, "attributes"))["aria-required"]
+    assert_nil field(post_class.new, required: false).at_css("textarea[required]")
+  end
+
+  test "placeholder, class and disabled are the editor's" do
+    html = field(placeholder: "Write", class: "min-h-64", disabled: true)
+
+    assert_equal "Write", data(html, "placeholder")
+    assert_includes JSON.parse(data(html, "attributes"))["class"], "min-h-64"
+    assert_equal "true", data(html, "disabled")
+    assert html.at_css("textarea[disabled]:not([placeholder])")
+  end
+
+  test "an Action Text attribute, with its images as <img data-sgid> and its other attachments left out" do
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("png"), filename: "a b.png", content_type: "image/png")
+    pdf = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("pdf"), filename: "a.pdf", content_type: "application/pdf")
+    article = Article.new(content: %(<p>Hi</p><action-text-attachment sgid="#{blob.attachable_sgid}" caption="A cat"></action-text-attachment><action-text-attachment sgid="#{pdf.attachable_sgid}"></action-text-attachment>))
+    html = Nokogiri::HTML5.fragment(FormComponents::FormBuilder.new(:article, article, vc_test_controller.view_context, {}).rich_text_area(:content))
+
+    assert_equal "true", data(html, "action-text")
+    value = Nokogiri::HTML5.fragment(html.at_css("textarea[name='article[content]']").text)
+    img = value.at_css("img")
+    assert_equal [blob.attachable_sgid, "image/png", "a b.png", "A cat"], [img["data-sgid"], img["data-content-type"], img["data-filename"], img["alt"]]
+    assert_equal "http://test.host/rails/active_storage/blobs/redirect/#{blob.signed_id}/a%20b.png", img["src"]
+    assert_equal 1, value.css("img").size
+    assert_nil value.at_css("action-text-attachment")
+  end
+
+  test "what the controller sends for an Action Text attribute is its content" do
+    blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new("png"), filename: "a.png", content_type: "image/png")
+    article = Article.create!(content: %(<p>Hi</p><action-text-attachment sgid="#{blob.attachable_sgid}" content-type="image/png" url="/x" filename="a.png"></action-text-attachment>))
+
+    assert_equal [blob], article.content.body.attachables
+    assert_includes article.content.to_plain_text, "Hi"
+  end
+end

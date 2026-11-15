@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- `rich_text_area` (`rich_textarea`) is a Tiptap editor instead of Rails'
+  Trix, for an Action Text attribute or one that holds HTML, with
+  `toolbar:` (and `default_toolbar` for the app) and `placeholder:`. Images
+  are uploaded with Active Storage's direct uploads, and are attachments on
+  an Action Text attribute. Tiptap is vendored
+  (`vendor/javascript/form_components/tiptap.js`, built by
+  `script/vendor/build.mjs`).
+
 ## 0.1.4
 
 - `telephone_field` (`phone_field`) has a country picker, with flags

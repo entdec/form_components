@@ -27,7 +27,7 @@
         background-repeat: no-repeat;
       }
       /* The components' styles, through Tailwind as in a host, for their auto-dark variants; their imports are linked below */
-      <% %w[color_field combobox].each do |name| %>
+      <% %w[color_field combobox rich_text_area].each do |name| %>
         <%== FormComponents::Engine.root.join("app/components/form_components/#{name}/component.css").read.gsub(/^@import .*$/, "") %>
       <% end %>
     </style>

@@ -224,4 +224,17 @@ class RailsParityTest < ComponentTest
     assert_equal controls(rails_form(post).text_field(:title)), without_added_required(controls(ours), controls(rails_form(post).text_field(:title)))
     assert_includes ours, "field_with_errors"
   end
+
+  test "rich_text_area and rich_textarea: Rails' name and value, in a text area instead of Trix' hidden input" do
+    post = Post.new(notes: "<p>Hi</p>")
+    [:rich_text_area, :rich_textarea].each do |helper|
+      [[{}, {}], [{index: 3}, {}], [{name: "other[name]"}, {}], [{}, {namespace: "ns", index: 2}]].each do |options, form_options|
+        ours = controls(form(post, **form_options).public_send(helper, :notes, options.merge(EXTRAS)))
+        rails = controls(rails_form(post, **form_options).public_send(helper, :notes, options)).first[1]
+        textarea = ours.find { |name, _| name == "textarea" }
+
+        assert_equal [rails["name"], rails["value"]], [textarea[1]["name"], textarea[2]], "#{helper}(#{options.inspect})"
+      end
+    end
+  end
 end

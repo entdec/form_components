@@ -6,3 +6,5 @@ Gemfile.lock
 test/dummy/log/
 test/dummy/tmp/
 mise.local.toml
+
+/script/vendor/node_modules

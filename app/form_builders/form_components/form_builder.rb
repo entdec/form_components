@@ -41,6 +41,13 @@ module FormComponents
     end
     alias_method :textarea, :text_area
 
+    # A Tiptap editor instead of Rails' Trix, for an Action Text attribute or
+    # one with HTML, see RichTextArea: with toolbar: its buttons
+    def rich_text_area(method, options = {})
+      component(:rich_text_area, method, options)
+    end
+    alias_method :rich_textarea, :rich_text_area
+
     def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
       component(:check_box, method, options, checked_value, unchecked_value)
     end

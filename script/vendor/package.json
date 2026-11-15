@@ -1,0 +1,16 @@
+{
+  "name": "form_components-vendor",
+  "private": true,
+  "type": "module",
+  "description": "Builds the single-file ESM bundle in vendor/javascript/form_components/tiptap.js. Run: cd script/vendor && npm install && node build.mjs",
+  "dependencies": {
+    "@rails/activestorage": "^8.1.0",
+    "@tiptap/core": "^3.34.0",
+    "@tiptap/extension-image": "^3.34.0",
+    "@tiptap/extension-text-align": "^3.34.0",
+    "@tiptap/extensions": "^3.34.0",
+    "@tiptap/pm": "^3.34.0",
+    "@tiptap/starter-kit": "^3.34.0",
+    "esbuild": "^0.25.0"
+  }
+}

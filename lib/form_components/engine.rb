@@ -9,7 +9,7 @@ module FormComponents
         app.config.assets.paths << root.join("app/javascript")
         # The components' Stimulus controllers
         app.config.assets.paths << root.join("app/components")
-        # JS Color Picker, for the color field
+        # JS Color Picker, for the color field, and Tiptap, for the rich text area
         app.config.assets.paths << root.join("vendor/javascript")
       end
     end

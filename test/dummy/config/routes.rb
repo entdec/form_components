@@ -3,4 +3,5 @@
 Rails.application.routes.draw do
   root "showcase#show"
   post "/", to: "showcase#create", as: :posts
+  resources :articles, only: %i[new create edit update]
 end
