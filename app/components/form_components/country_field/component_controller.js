@@ -33,8 +33,8 @@ export default class extends CountryPicker {
     super.updateToggle()
     const iso = this.countryValue
     this.nameTarget.textContent = iso ? this.names.get(iso) : this.placeholderValue
-    this.nameTarget.classList.toggle("text-gray-400", !iso)
-    this.nameTarget.classList.toggle("auto-dark:text-gray-500", !iso)
+    this.nameTarget.classList.toggle("text-gray-500", !iso)
+    this.nameTarget.classList.toggle("auto-dark:text-gray-400", !iso)
     if (this.hasClearTarget) this.clearTarget.hidden = !iso
   }
 }

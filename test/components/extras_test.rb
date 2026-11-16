@@ -62,11 +62,11 @@ class CollectionTest < ComponentTest
   test "a fieldset, its label as the legend, the description once and each item's own" do
     render_inline FormComponents::CollectionRadioButtons::Component.new(form, Post.new, :kind, Post::KINDS, :first, :second, {label: "Kind of post", description: "Pick one", description_method: :third})
 
-    assert_select "fieldset[aria-describedby=post_kind_description] > legend", text: "Kind of post"
+    assert_select "fieldset#post_kind[aria-describedby=post_kind_description] > legend", text: "Kind of post"
     assert_select "p#post_kind_description", text: "Pick one", count: 1
     assert_select "label[for=post_kind_news]", text: "News"
     assert_select "input#post_kind_news[aria-describedby=post_kind_news_description]"
-    assert_select "label#post_kind_news_description", text: "What happened"
+    assert_select "p#post_kind_news_description", text: "What happened"
   end
 
   test "the legend is the attribute's name, marked when required, or none" do
@@ -75,8 +75,9 @@ class CollectionTest < ComponentTest
       validates :tags, presence: true
     end
     render_inline FormComponents::CollectionCheckBoxes::Component.new(form(post_class.new), post_class.new, :tags, Post::TAGS, :itself, :titleize)
-    assert_select "legend", text: "Tags"
-    assert_select "legend .fa-asterisk"
+    assert_select "legend", text: "Tags (required)"
+    assert_select "legend .fa-asterisk[aria-hidden=true]"
+    assert_select "legend .sr-only", text: "(required)"
 
     render_inline FormComponents::CollectionCheckBoxes::Component.new(form, Post.new, :tags, Post::TAGS, :itself, :titleize, {label: false})
     assert_select "legend", count: 0
@@ -99,7 +100,7 @@ class SelectTest < ComponentTest
     render_inline FormComponents::Select::Component.new(form(post), post, :category, [["News"]], {description: "Pick one"}, {id: "mine"})
 
     assert_select "label[for=mine]", text: "Category"
-    assert_select "select#mine[aria-invalid=true][aria-describedby=mine_error]"
+    assert_select "select#mine[aria-invalid=true][aria-describedby='mine_error mine_description']"
     assert_select "p#mine_description", text: "Pick one"
     assert_select "p#mine_error", text: "can't be blank"
   end
@@ -158,14 +159,15 @@ class ScaleTest < ComponentTest
 end
 
 class RatingTest < ComponentTest
-  test "stars from 1 to max, each a radio button with its number for screen readers" do
+  test "stars from 1 to max, each a radio button with its stars for screen readers" do
     render_inline FormComponents::RatingField::Component.new(form(Post.new(rating: 4)), Post.new(rating: 4), :rating, {max: 10, description: "How good"})
 
     assert_select "fieldset[aria-describedby=post_rating_description] > legend", text: "Rating"
     assert_select "input[type=radio][name='post[rating]']", count: 10
     assert_select "input#post_rating_4[checked]"
     assert_select "label[for=post_rating_1] svg[aria-hidden=true]"
-    assert_select "label[for=post_rating_1] .sr-only", text: "1"
+    assert_select "label[for=post_rating_1] .sr-only", text: "1 star"
+    assert_select "label[for=post_rating_2] .sr-only", text: "2 stars"
   end
 
   test "five unless given, and errors on each star" do
@@ -244,8 +246,15 @@ class RichTextAreaTest < ComponentTest
   test "the default toolbar, with the image button when the host has Active Storage" do
     html = field
 
-    assert html.at_css("[role=toolbar] select[data-form-components--rich-text-area-target=heading]")
-    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    toggle = html.at_css("[role=toolbar] button[data-form-components--rich-text-area-target=headingToggle][aria-expanded=false][aria-controls=post_notes_headings][aria-label=Heading]")
+    assert toggle
+    assert_equal %w[0 1 2 3], html.css("#post_notes_headings[hidden] button[aria-pressed=false]").map { |item| item["data-level"] }
+    assert_equal ["Paragraph", "Heading 1", "Heading 2", "Heading 3"], html.css("#post_notes_headings button").map { |item| item.text.strip }
+    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
+    # Lucide's icons, hidden from screen readers; the image button says "Add image"
+    assert_equal 11, html.css("[role=toolbar] button[data-command] > svg[aria-hidden=true][viewBox='0 0 24 24']").size
+    assert_equal "Add image", html.at_css("button[data-command=image]").text.squish
+    assert_nil html.at_css("button[data-command=image][aria-label]")
     assert_equal 5, html.css("[role=toolbar] > span[aria-hidden]").size
     assert_equal FormComponents::RichTextArea::Component.default_toolbar.without(:|).map(&:to_s), JSON.parse(data(html, "toolbar"))
     assert_equal "http://test.host/rails/active_storage/direct_uploads", data(html, "direct-upload-url")
@@ -255,7 +264,7 @@ class RichTextAreaTest < ComponentTest
   test "a toolbar of its own, without separators at the ends or next to each other, or none" do
     html = field(toolbar: %i[| bold | | code_block align_center |])
 
-    assert_equal %w[bold code_block align_center], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    assert_equal %w[bold code_block align_center], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
     assert_equal 1, html.css("[role=toolbar] > span[aria-hidden]").size
     assert_nil html.at_css("[data-form-components--rich-text-area-target=linkMenu]")
     assert_nil field(toolbar: false).at_css("[role=toolbar]")
@@ -265,7 +274,7 @@ class RichTextAreaTest < ComponentTest
   test "no image button nor uploads without a direct upload URL" do
     html = field(toolbar: %i[bold image], data: {direct_upload_url: nil})
 
-    assert_equal %w[bold], html.css("[role=toolbar] button").map { |button| button["data-command"] }
+    assert_equal %w[bold], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
     assert_nil data(html, "direct-upload-url")
     assert_nil html.at_css("input[type=file]")
   end

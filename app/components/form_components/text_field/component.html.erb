@@ -8,10 +8,10 @@
   <div class="mt-2 grid grid-cols-1">
     <%= input %>
     <% if leading_icon.present? %>
-      <span class="<%= class_names("pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-4", leading_icon) %>"></span>
+      <span class="<%= class_names("pointer-events-none col-start-1 row-start-1 ml-3 size-5 self-center text-gray-400 sm:size-4", leading_icon) %>" aria-hidden="true"></span>
     <% end %>
     <% if has_error? %>
-      <div class="fas fa-circle-exclamation pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4"></div>
+      <div class="fas fa-circle-exclamation pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-red-500 sm:size-4" aria-hidden="true"></div>
     <% end %>
   </div>
   <% if description.present? %>

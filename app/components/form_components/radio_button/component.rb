@@ -19,6 +19,9 @@ module FormComponents
       def input_id
         tag_id(tag_value)
       end
+
+      # A radio button can't have aria-required
+      def required_in_label? = required? && !required_attribute?
     end
   end
 end

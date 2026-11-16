@@ -94,10 +94,14 @@
     float: left;
     height: 0;
     pointer-events: none;
-    color: var(--color-gray-400);
+    color: var(--color-gray-500);
   }
 
   @variant auto-dark {
+    & p.is-editor-empty:first-child::before {
+      color: var(--color-gray-400);
+    }
+
     & blockquote {
       border-color: rgb(255 255 255 / 0.2);
       color: var(--color-gray-400);

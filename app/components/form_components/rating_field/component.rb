@@ -26,9 +26,14 @@ module FormComponents
       def item(builder)
         input = builder.radio_button(class: "sr-only", "aria-invalid": aria_invalid, required: required_attribute? || nil)
         label = builder.label(class: ITEM_CLASSES) do
-          safe_join([star, tag.span(builder.text, class: "sr-only")])
+          safe_join([star, tag.span(stars(builder.value), class: "sr-only")])
         end
         safe_join([label, input])
+      end
+
+      # A star's name: "3 stars"
+      def stars(count)
+        I18n.t("form_components.rating_field.stars", count: count, default: {one: "%{count} star", other: "%{count} stars"})
       end
 
       def star

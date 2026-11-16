@@ -28,12 +28,14 @@ module FormComponents
         rails(helper, method, collection, value_method, text_method, html_options, item_html_options, &each_item)
       end
 
+      # Saying it's required for screen readers too unless each radio button
+      # is, as check boxes and a fieldset can't be
       def legend
-        safe_join([label.presence || human_attribute_name, (tag.span(class: "fas fa-asterisk fa-xs text-red-500 ml-1", aria: {hidden: true}) if required?)])
+        safe_join([label.presence || human_attribute_name, (asterisk(required_text: !required_attribute?) if required?)])
       end
 
       def legend_classes
-        FormComponents::Label::Component::CLASSES
+        class_names(FormComponents::Label::Component::CLASSES, "sr-only" => hide_label)
       end
 
       def items_classes
@@ -66,7 +68,7 @@ module FormComponents
             tag.div(class: "ml-3 text-sm/6") do
               safe_join([
                 builder.label(class: FormComponents::Label::Component::CLASSES),
-                (tag.label(description, for: id, id: "#{id}_description", class: "text-gray-500 auto-dark:text-gray-400") if description.present?)
+                (tag.p(description, id: "#{id}_description", class: "text-gray-500 auto-dark:text-gray-400") if description.present?)
               ])
             end
           ])

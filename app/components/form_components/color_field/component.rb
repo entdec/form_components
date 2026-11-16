@@ -18,6 +18,18 @@ module FormComponents
         default if default.to_s.match?(/\A#\h{6}\z/)
       end
 
+      # For the controller to name the toggle with
+      def field_label(id = tag_id, value: nil)
+        super(id, id: "#{id}_label")
+      end
+
+      # The names of the picker's controls, which it has none of
+      def picker_labels
+        {value: "Hex", eyedropper: "Pick from the screen", clear: "Clear", submit: "Done"}.to_h do |name, default|
+          [name, I18n.t("form_components.color_field.#{name}", default: default)]
+        end
+      end
+
       def input
         rails(:text_field, method, input_options(nil).merge(placeholder: default_color || html_options[:placeholder], data: (html_options[:data] || {}).merge("form-components--color-field-target": "input")).compact)
       end

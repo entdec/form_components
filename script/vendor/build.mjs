@@ -67,6 +67,7 @@ rmSync(images, { recursive: true, force: true })
 mkdirSync(images, { recursive: true })
 const codes = readdirSync(flags).filter((file) => file.endsWith(".svg")).map((file) => file.replace(/\.svg$/, "")).sort()
 for (const code of codes) copyFileSync(flags + code + ".svg", images + code + ".svg")
+copyFileSync(new URL("node_modules/flag-icons/LICENSE", import.meta.url).pathname, images + "LICENSE")
 writeFileSync(new URL("../../app/assets/stylesheets/form_components/flags.css", import.meta.url).pathname, [
   `/* flag-icons ${version("flag-icons")} (MIT), its 4:3 flags. Built by script/vendor/build.mjs */`,
   ".fi { position: relative; display: inline-block; width: 1.333333em; line-height: 1em; background-size: contain; background-position: 50%; background-repeat: no-repeat; }",
@@ -74,3 +75,25 @@ writeFileSync(new URL("../../app/assets/stylesheets/form_components/flags.css", 
   ...codes.map((code) => `.fi-${code} { background-image: url("form_components/flags/${code}.svg"); }`)
 ].join("\n") + "\n")
 console.log(`wrote app/assets/images/form_components/flags (${codes.length}) and app/assets/stylesheets/form_components/flags.css`)
+
+// Lucide's icons, for the rich text area's toolbar: as SVGs the component
+// puts in the page, so they take the text's colour; their lines a little
+// lighter than Lucide's
+const lucide = new URL("node_modules/lucide-static/icons/", import.meta.url).pathname
+const icons = new URL("../../app/assets/images/form_components/icons/", import.meta.url).pathname
+const iconNames = [
+  "undo-2", "redo-2", "heading", "pilcrow", "heading-1", "heading-2", "heading-3", "chevron-down",
+  "bold", "italic", "underline", "strikethrough", "code", "link", "unlink", "list", "list-ordered", "text-quote",
+  "square-code", "minus", "align-left", "align-center", "align-right", "align-justify", "image-plus"
+]
+rmSync(icons, { recursive: true, force: true })
+mkdirSync(icons, { recursive: true })
+for (const name of iconNames) {
+  const svg = readFileSync(lucide + name + ".svg", "utf8")
+    .replace(/ class="[^"]*"| width="24"| height="24"/g, "")
+    .replace('stroke-width="2"', 'stroke-width="1.75"')
+    .replace(/\n\s*/g, " ").replace(/ >/g, ">").replace(/> </g, "><").trim()
+  writeFileSync(icons + name + ".svg", svg + "\n")
+}
+copyFileSync(new URL("node_modules/lucide-static/LICENSE", import.meta.url).pathname, icons + "LICENSE")
+console.log(`wrote app/assets/images/form_components/icons (${iconNames.length}, lucide-static ${version("lucide-static")}, ISC)`)

@@ -101,7 +101,7 @@ module FormComponents
       end
 
       def input_classes
-        class_names("block min-w-0 grow border-0 bg-transparent px-3 py-1.5 text-base placeholder:text-gray-400 focus:outline-none focus:ring-0 sm:text-sm/6 auto-dark:placeholder:text-gray-500",
+        class_names("block min-w-0 grow border-0 bg-transparent px-3 py-1.5 text-base placeholder:text-gray-500 focus:outline-none focus:ring-0 sm:text-sm/6 auto-dark:placeholder:text-gray-400",
           {"text-gray-900 auto-dark:text-white" => !has_error?},
           {"text-red-900 placeholder:text-red-300 auto-dark:text-red-300" => has_error?})
       end

@@ -25,18 +25,27 @@ module FormComponents
         return if min_label.blank? && max_label.blank?
 
         tag.div(class: "mt-2 flex justify-between gap-4 text-sm text-gray-500 auto-dark:text-gray-400") do
-          safe_join([tag.span(min_label), tag.span(max_label, class: "text-right")])
+          safe_join([tag.span(min_label, id: "#{tag_id}_min_label"), tag.span(max_label, id: "#{tag_id}_max_label", class: "text-right")])
         end
       end
 
       private
 
+      def end_label_id(value)
+        if value == collection.first && min_label.present?
+          "#{tag_id}_min_label"
+        elsif value == collection.last && max_label.present?
+          "#{tag_id}_max_label"
+        end
+      end
+
       def numbers(options)
         options.fetch(:in, 1..5).to_a
       end
 
+      # The labels at the ends describe the numbers there
       def item(builder)
-        input = builder.radio_button(class: "peer sr-only", "aria-invalid": aria_invalid, required: required_attribute? || nil)
+        input = builder.radio_button(class: "peer sr-only", "aria-invalid": aria_invalid, required: required_attribute? || nil, "aria-describedby": end_label_id(builder.value))
         tag.div(safe_join([input, builder.label(class: ITEM_CLASSES)]), class: "min-w-0 flex-1")
       end
     end

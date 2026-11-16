@@ -1,5 +1,7 @@
 /* The code editor (component.rb): CodeMirror in the field's frame, with the
-   field's colours, also dark */
+   field's colours, also dark. The gutter is part of the field, not a band of
+   its own: its line numbers muted, the current one darker, and the current
+   line marked only while the editor has the focus */
 .form-code-editor .cm-editor {
   font-size: var(--text-sm);
   color: var(--color-gray-900);
@@ -9,15 +11,46 @@
     outline: none;
   }
 
+  & .cm-scroller {
+    font-family: var(--font-mono);
+    line-height: 1.6;
+  }
+
+  & .cm-content {
+    padding-block: 0.5rem;
+  }
+
   & .cm-gutters {
-    border-right-color: var(--color-gray-200);
-    background-color: var(--color-gray-50);
+    border-right: 1px solid var(--color-gray-100);
+    background-color: transparent;
     color: var(--color-gray-400);
   }
 
+  & .cm-gutters .cm-gutterElement {
+    padding-inline: 0.75rem 0.5rem;
+  }
+
+  & .cm-foldGutter .cm-gutterElement {
+    padding-inline: 0 0.25rem;
+  }
+
+  & .cm-activeLine,
   & .cm-activeLineGutter {
-    background-color: var(--color-gray-100);
+    background-color: transparent;
+  }
+
+  &.cm-focused .cm-activeLine {
+    background-color: var(--color-gray-50);
+  }
+
+  &.cm-focused .cm-activeLineGutter {
     color: var(--color-gray-700);
+  }
+
+  & .cm-selectionBackground,
+  &.cm-focused .cm-selectionBackground,
+  & ::selection {
+    background-color: var(--color-primary-100) !important;
   }
 
   @variant auto-dark {
@@ -25,14 +58,15 @@
     color-scheme: dark;
 
     & .cm-gutters {
-      border-right-color: rgb(255 255 255 / 0.1);
-      background-color: rgb(255 255 255 / 0.05);
+      border-right-color: rgb(255 255 255 / 0.05);
       color: var(--color-gray-500);
     }
 
-    & .cm-activeLine,
-    & .cm-activeLineGutter {
-      background-color: rgb(255 255 255 / 0.05);
+    &.cm-focused .cm-activeLine {
+      background-color: rgb(255 255 255 / 0.03);
+    }
+
+    &.cm-focused .cm-activeLineGutter {
       color: var(--color-gray-300);
     }
 
@@ -41,7 +75,8 @@
     }
 
     & .cm-selectionBackground,
-    &.cm-focused .cm-selectionBackground {
+    &.cm-focused .cm-selectionBackground,
+    & ::selection {
       background-color: rgb(255 255 255 / 0.15) !important;
     }
   }

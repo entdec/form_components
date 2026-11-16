@@ -1,6 +1,7 @@
 <h1 class="mb-6 text-2xl font-semibold text-gray-900 auto-dark:text-white">Form components</h1>
 
 <%= form_with model: @post, url: posts_path, builder: FormComponents::FormBuilder, class: "space-y-6" do |f| %>
+  <%= f.error_summary %>
   <%= f.fieldset "About", description: "A fieldset, its heading above its card" do %>
     <%= f.text_field :title, placeholder: "A title", description: "Shown on top" %>
     <%= f.email_field :email, leading_icon: "fas fa-envelope", corner_hint: "Optional" %>

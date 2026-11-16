@@ -5,7 +5,8 @@ import SignaturePad from "form_components/signature_pad"
 // change event on it as choosing a file would. The signature there (the
 // image under the pad) stays until the first stroke, which starts a new one;
 // clear also removes it, when there is a remove field. Undo and clear are in
-// a menu, as an image upload's.
+// a menu, as an image upload's: a disclosure, its button's focus back when
+// it closes with the focus in it.
 export default class extends Controller {
   static targets = ["canvas", "image", "file", "remove", "menu", "more"]
   static values = { readOnly: Boolean }
@@ -58,13 +59,16 @@ export default class extends Controller {
   open() {
     this.menuTarget.hidden = false
     this.moreTarget.setAttribute("aria-expanded", "true")
+    this.menuTarget.querySelector("button")?.focus()
   }
 
   close() {
-    if (!this.hasMenuTarget) return
+    if (!this.hasMenuTarget || this.menuTarget.hidden) return
 
+    const focused = this.menuTarget.contains(document.activeElement)
     this.menuTarget.hidden = true
     this.moreTarget.setAttribute("aria-expanded", "false")
+    if (focused) this.moreTarget.focus()
   }
 
   // Back to the signature there, when the pad is empty again

@@ -58,7 +58,7 @@ class ColorFieldTest < ComponentTest
     render_inline FormComponents::ColorField::Component.new(form(post), post, :color, description: "For the bar")
 
     assert_select "p#post_color_description", text: "For the bar"
-    assert_select ".form-color-field--error input[aria-invalid='true'][aria-describedby='post_color_error']"
+    assert_select ".form-color-field--error input[aria-invalid='true'][aria-describedby='post_color_error post_color_description']"
     assert_select "p#post_color_error", text: "is invalid"
   end
 end

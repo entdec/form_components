@@ -25,6 +25,7 @@
     "codemirror": "^6.0.2",
     "esbuild": "^0.25.0",
     "flag-icons": "^7.6.0",
+    "lucide-static": "^0.460.0",
     "signature_pad": "^5.1.4"
   }
 }

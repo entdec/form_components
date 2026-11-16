@@ -1,8 +1,14 @@
 module FormComponents
   module Label
-    # Rails' label, with its text marked when the attribute is required
+    # Rails' label, with its text marked when the attribute is required: an
+    # asterisk, and with required_text: true also the word, for screen
+    # readers, for an input that can't say it's required itself
     class Component < FormComponents::Base::Component
+      self.extras = %i[required_text]
+
       CLASSES = "block text-sm/6 font-medium text-gray-900 auto-dark:text-white"
+
+      option_reader :required_text, false
 
       attr_reader :text, :block
 
@@ -17,14 +23,8 @@ module FormComponents
       def call
         rails(:label, method, text, html_options.merge(class: helpers.class_names(CLASSES, html_options[:class]))) do |builder|
           content = block ? helpers.capture(builder, &block) : (text.presence || builder.translation)
-          safe_join([content, (asterisk if required?)])
+          safe_join([content, (asterisk(required_text: required_text) if required?)])
         end
-      end
-
-      private
-
-      def asterisk
-        tag.span(class: "fas fa-asterisk fa-xs text-red-500 ml-1", aria: {hidden: true})
       end
     end
   end

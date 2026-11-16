@@ -38,7 +38,10 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
 
 ### What the host provides
 
-- A `primary` color in its Tailwind theme (`--color-primary-50` to `-950`).
+- A `primary` color in its Tailwind theme (`--color-primary-50` to `-950`),
+  whose `-600` has a contrast of at least 4.5:1 with white (the submit
+  button's text, a scale's number picked) and with the page (the nested
+  form's add button).
 - The `@tailwindcss/forms` plugin (`@plugin "@tailwindcss/forms";`), which
   draws a select's arrow and a checked check box's checkmark.
 - An `auto-dark` variant, for the components' dark mode, so the host decides
@@ -49,7 +52,8 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
   ```
 
   or keep it off with `@custom-variant auto-dark (&:where(.never-dark, .never-dark *));`
-- [Font Awesome](https://fontawesome.com), for the icons (`fas`, `fal`).
+- [Font Awesome](https://fontawesome.com), for the icons (`fas`, `fal`); the
+  rich text area's toolbar has its own, [Lucide](https://lucide.dev)'s.
 - [Propshaft](https://github.com/rails/propshaft), which resolves the flags'
   `url(form_components/flags/nl.svg)` in the stylesheet to the gem's images.
   The flags are [flag-icons](https://flagicons.lipis.dev)' (4:3, vendored),
@@ -114,7 +118,9 @@ Rails doesn't get:
 
 - **Every field**: `label:` (a text, or false for none) and `description:`,
   shown below it. A label is Rails' `label`, so its text comes from
-  `helpers.label.<model>.<attribute>` too.
+  `helpers.label.<model>.<attribute>` too. `hide_label: true` keeps the label
+  for screen readers only; with `label: false` the input needs a name of its
+  own (`aria: {label: …}`) or a label elsewhere.
 - **Text fields**: `text_field`, `password_field`, `search_field`,
   `date_field`, `time_field`,
   `datetime_field`, `datetime_local_field`, `month_field`, `week_field`,
@@ -132,7 +138,7 @@ Rails doesn't get:
   <%= f.rich_text_area :content, toolbar: %i[heading | bold italic link | bullet_list ordered_list] %>
   ```
 
-  The buttons are `heading` (a select of paragraph and headings 1–3), `bold`,
+  The buttons are `heading` (a menu of paragraph and headings 1–3), `bold`,
   `italic`, `underline`, `strike`, `code`, `link` (⌘K), `bullet_list`,
   `ordered_list`, `blockquote`, `code_block`, `horizontal_rule`,
   `align_left`, `align_center`, `align_right`, `align_justify`, `image`,
@@ -149,7 +155,9 @@ Rails doesn't get:
   left out. `placeholder:` shows while it's empty, `class:` is the editor's
   and `corner_hint:` as a text area; translate the buttons' titles in
   `form_components.rich_text_area` (`bold`, `bullet_list`, …,
-  `heading_level`, `paragraph`, `url`, `apply`, `remove_link`). Like the
+  `heading_level`, `paragraph`, `url`, `apply`, `remove_link`, `add`, the
+  image button's text). The buttons are light, with Lucide's icons, as
+  Tiptap's own editor has them. Like the
   color field it needs JS; `upload-error` is dispatched
   (`form-components--rich-text-area:upload-error`) when an upload fails, with
   an alert unless it's prevented.
@@ -199,7 +207,8 @@ Rails doesn't get:
   as picked. It needs JS.
 - **Check boxes and radio buttons**: `check_box` (`checkbox`), with its hidden
   unchecked value, `multiple:` and the rest as Rails, and `switch: true` to
-  look like a switch (still the check box, with `role="switch"`, no JS);
+  look like a switch (still the check box, with `role="switch"`, no JS), a
+  check in its knob when it's on and a cross when it's off;
   `radio_button`.
 - **Collections**: `collection_check_boxes` and `collection_radio_buttons` in a
   fieldset, with the label as its legend and the description and errors once;
@@ -288,12 +297,64 @@ its input gets `required`, for the browser to check, when the validator
 holds for the record as it is (its `if:` and `unless:`). Not for a check box
 that is one of several or of a collection, which would each have to be
 checked, nor for a file field, as a file there already isn't sent again.
-`required: false` leaves it out. Pass the validation context to the form to
-count those `on:` it:
+`required: false` leaves it out.
+
+Where the label is marked but the browser doesn't check it (a validator's
+`if:` that doesn't hold now), the input gets `aria-required="true"`, for
+screen readers. An input that can't have it (a radio button, a file field,
+the signature pad, the country field's button) has "(required)" in its label
+for them (`form_components.required`), as has a collection's legend, unless
+each of its radio buttons is required.
+
+Pass the validation context to the form to count those `on:` it:
 
 ```erb
 <%= form_with model: @post, builder: FormComponents::FormBuilder, validation_context: :publish do |f| %>
 ```
+
+### Error summary
+
+`error_summary` lists the form's errors above its fields, each a link to its
+field (a `belongs_to`'s to its foreign key's), as the W3C's
+[forms tutorial](https://www.w3.org/WAI/tutorials/forms/notifications/) has
+it. It shows only when there are errors, and has the focus (`autofocus`), so
+a screen reader reads it when the page shows again after a form that didn't
+save. `title:` replaces its heading, "There are 2 errors in this form"
+(`form_components.error_summary.title`, with `one` and `other`).
+
+```erb
+<%= form_with model: @post, builder: FormComponents::FormBuilder do |f| %>
+  <%= f.error_summary %>
+  …
+```
+
+### Accessibility
+
+The fields follow the W3C's [forms tutorial](https://www.w3.org/WAI/tutorials/forms/):
+
+- Every input has a label (Rails' `label`, `for` its id), a group of radio
+  buttons or check boxes a fieldset with a legend; an input of JS (the rich
+  text area, the code editor, the signature pad, the pickers' buttons) is
+  named by the label too (`aria-labelledby`).
+- An input is described by its errors and its description
+  (`aria-describedby`), and has `aria-invalid`. A check box's or radio
+  button's description describes it, without being part of its label.
+- Icons are hidden from screen readers; buttons with only an icon have a
+  name (`aria-label`, translatable).
+- The country lists are a combobox with a listbox (arrow keys, Enter,
+  Escape); the rich text area's toolbar is one stop for Tab, its buttons one
+  after another with the arrow keys, Home and End; the signature field's menu
+  is a disclosure, and gives the focus back to its button; adding an item to
+  a nested form focuses its first field, removing one the add button.
+- The color picker's toggle and dialog are named, and its dialog opens with
+  the focus on its hex field, for the keyboard; JS Color Picker puts the
+  input in its button, which axe reports as nested controls.
+- Drawing a signature needs a pointer, as WCAG allows for a signature
+  (2.1.1); offer another way to sign (a name typed, say) where that matters.
+
+What the host does: a `lang` on `<html>`, a page title that says when the
+form has errors, and a `primary` color with enough contrast (see
+[What the host provides](#what-the-host-provides)).
 
 ### Nested forms
 
@@ -347,7 +408,9 @@ Tiptap, and Active Storage's `DirectUpload`, are vendored as one ES module,
 languages as another, `codemirror.js`, and signature_pad as
 `signature_pad.js`; flag-icons' flags are copied into
 `app/assets/images/form_components/flags`, with their classes in
-`app/assets/stylesheets/form_components/flags.css`. To update them:
+`app/assets/stylesheets/form_components/flags.css`, and the toolbar's Lucide
+icons into `app/assets/images/form_components/icons`, each with its license.
+To update them:
 
 ```sh
 cd script/vendor && npm install && node build.mjs

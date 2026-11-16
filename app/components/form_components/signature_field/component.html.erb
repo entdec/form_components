@@ -11,12 +11,12 @@
     <% end %>
     <% unless read_only? %>
       <div class="relative">
-        <button type="button" class="<%= more_classes %>" title="<%= title(:more) %>" aria-label="<%= title(:more) %>" aria-haspopup="menu" aria-expanded="false" data-form-components--signature-field-target="more" data-action="form-components--signature-field#toggle">
+        <button type="button" class="<%= more_classes %>" title="<%= title(:more) %>" aria-label="<%= title(:more) %>" aria-expanded="false" aria-controls="<%= tag_id %>_menu" data-form-components--signature-field-target="more" data-action="form-components--signature-field#toggle">
           <span class="fas fa-ellipsis" aria-hidden="true"></span>
         </button>
-        <div class="absolute top-full left-0 z-20 mt-2 flex min-w-44 flex-col rounded-xl border border-gray-200 bg-white p-1 text-sm shadow-lg auto-dark:border-white/10 auto-dark:bg-gray-900" role="menu" hidden data-form-components--signature-field-target="menu">
+        <div class="absolute top-full left-0 z-20 mt-2 flex min-w-44 flex-col rounded-xl border border-gray-200 bg-white p-1 text-sm shadow-lg auto-dark:border-white/10 auto-dark:bg-gray-900" id="<%= tag_id %>_menu" hidden data-form-components--signature-field-target="menu">
           <% {undo: "fal fa-arrow-rotate-left", clear: "fal fa-trash"}.each do |name, icon| %>
-            <button type="button" role="menuitem" class="<%= menu_item_classes %>" data-action="form-components--signature-field#<%= name %>">
+            <button type="button" class="<%= menu_item_classes %>" data-action="form-components--signature-field#<%= name %>">
               <span class="<%= icon %> w-4 text-gray-500 auto-dark:text-gray-400" aria-hidden="true"></span>
               <%= title(name) %>
             </button>

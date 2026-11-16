@@ -39,6 +39,15 @@ module FormComponents
 
       def clearable? = !required_attribute? && !html_options[:disabled]
 
+      # Its toggle, a button, can't have aria-required
+      def required_in_label? = required?
+
+      # Named by the label and the country picked (or the placeholder), which
+      # a label alone would leave out
+      def field_label(id = tag_id, value: nil)
+        super(id, id: "#{id}_label")
+      end
+
       def hidden_input
         rails(:hidden_field, method, html_options.slice(:index, :name, :form, :disabled, :data).merge(id: nil, value: country&.upcase,
           data: (html_options[:data] || {}).merge("form-components--country-field-target": "value", action: "change->form-components--country-field#changed")))
@@ -47,6 +56,7 @@ module FormComponents
       def toggle_attributes
         given = input_options(toggle_classes, from: html_options.except(:name, :value, :data, :index, :form))
         given.except(:required, :"aria-required").merge(type: "button", id: tag_id, "aria-haspopup": "listbox", "aria-expanded": "false",
+          "aria-labelledby": [("#{tag_id}_label" unless label == false), "#{tag_id}_value"].compact.join(" "),
           data: {"form-components--country-field-target": "toggle", action: "form-components--country-field#toggle keydown->form-components--country-field#toggleKeydown"})
       end
 

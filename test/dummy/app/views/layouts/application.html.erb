@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>">
   <head>
     <title>Form components</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -12,7 +12,9 @@
         --color-primary-50: rgb(232, 250, 244); --color-primary-100: rgb(215, 246, 236); --color-primary-300: rgb(158, 232, 208);
         --color-primary-500: rgb(100, 218, 180); --color-primary-600: rgb(48, 204, 153); --color-primary-700: rgb(35, 150, 113);
       }
-      /* The select arrow and checkmark of @tailwindcss/forms, which a host has (see the README); the browser build can't load plugins */
+      /* The select arrow and checkmark of @tailwindcss/forms, which a host has (see the README); the browser build can't load
+         plugins. In the base layer, as the plugin's, so utilities override them */
+      @layer base {
       select:not([multiple]) {
         background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         background-position: right 0.5rem center;
@@ -26,9 +28,10 @@
         background-position: center;
         background-repeat: no-repeat;
       }
+      }
       /* The components' styles, through Tailwind as in a host, for their auto-dark variants; their imports are linked below */
-      <% %w[color_field combobox rich_text_area].each do |name| %>
-        <%== FormComponents::Engine.root.join("app/components/form_components/#{name}/component.css").read.gsub(/^@import .*$/, "") %>
+      <% [*Dir[FormComponents::Engine.root.join("app/components/form_components/*/component.css")].sort, FormComponents::Engine.root.join("app/assets/stylesheets/form_components/application.css")].each do |file| %>
+        <%== File.read(file).gsub(/^@import .*$/, "") %>
       <% end %>
     </style>
     <%= stylesheet_link_tag "form_components/jscolorpicker/colorpicker", "hotwire_combobox" %>

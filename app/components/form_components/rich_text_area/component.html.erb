@@ -7,22 +7,32 @@
   <% end %>
   <div class="<%= wrapper_classes %>">
     <% if toolbar.any? %>
-      <div class="flex flex-wrap items-center gap-1 border-b border-gray-200 px-2 py-1.5 auto-dark:border-white/10" role="toolbar" aria-controls="<%= tag_id %>_editor" data-form-components--rich-text-area-target="toolbar">
+      <div class="flex flex-wrap items-center gap-0.5 border-b border-gray-200 px-2 py-1.5 auto-dark:border-white/10" role="toolbar" aria-label="<%= toolbar_label %>" aria-controls="<%= tag_id %>_editor" data-form-components--rich-text-area-target="toolbar" data-action="keydown->form-components--rich-text-area#toolbarKeydown">
         <% toolbar_groups.each_with_index do |group, index| %>
           <% if index > 0 %>
-            <span class="mx-1 h-5 w-px bg-gray-200 auto-dark:bg-white/10" aria-hidden="true"></span>
+            <span class="mx-1.5 h-6 w-px bg-gray-200 auto-dark:bg-white/10" aria-hidden="true"></span>
           <% end %>
           <% group.each do |name| %>
             <% if name == :heading %>
-              <select class="h-7 rounded-md border-0 bg-transparent py-0 pr-7 pl-2 text-sm text-gray-700 outline outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:outline-primary-600 focus:ring-0 auto-dark:bg-gray-800 auto-dark:text-gray-200 auto-dark:outline-white/10" aria-label="<%= title(:heading) %>" data-form-components--rich-text-area-target="heading" data-action="form-components--rich-text-area#heading">
-                <option value="0"><%= paragraph_label %></option>
-                <% HEADING_LEVELS.each do |level| %>
-                  <option value="<%= level %>"><%= heading_label(level) %></option>
-                <% end %>
-              </select>
+              <div class="relative">
+                <button type="button" class="<%= button_classes %>" title="<%= title(:heading) %>" aria-label="<%= title(:heading) %>" aria-expanded="false" aria-controls="<%= tag_id %>_headings" data-form-components--rich-text-area-target="headingToggle" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#toggleHeadings">
+                  <%= icon("heading") %><%= icon("chevron-down", "-ml-1 size-3 shrink-0") %>
+                </button>
+                <div id="<%= tag_id %>_headings" class="absolute top-full left-0 z-20 mt-1 flex min-w-40 flex-col rounded-xl bg-white p-1 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--rich-text-area-target="headingMenu" data-action="keydown->form-components--rich-text-area#headingMenuKeydown">
+                  <% [0, *HEADING_LEVELS].each do |level| %>
+                    <button type="button" class="<%= menu_item_classes %>" aria-pressed="false" data-level="<%= level %>" data-form-components--rich-text-area-target="headingItem" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#heading">
+                      <%= icon(heading_icon(level), "size-4 shrink-0 text-gray-500 auto-dark:text-gray-400") %><%= level.zero? ? paragraph_label : heading_label(level) %>
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            <% elsif name == :image %>
+              <button type="button" class="<%= button_classes %> pr-2" title="<%= title(:image) %>" data-command="image" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
+                <%= icon(BUTTONS[:image]) %><span><%= add_image_label %><span class="sr-only"> <%= title(:image).downcase %></span></span>
+              </button>
             <% else %>
               <button type="button" class="<%= button_classes %>" title="<%= title(name) %>" aria-label="<%= title(name) %>" data-command="<%= name %>" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
-                <span class="<%= BUTTONS[name] %>" aria-hidden="true"></span>
+                <%= icon(BUTTONS[name]) %>
               </button>
             <% end %>
           <% end %>
@@ -30,11 +40,11 @@
       </div>
     <% end %>
     <% if toolbar.include?(:link) %>
-      <div class="absolute top-11 left-2 z-20 flex w-80 max-w-[calc(100%-1rem)] items-center gap-2 rounded-lg bg-white p-2 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--rich-text-area-target="linkMenu">
-        <input type="url" class="block min-w-0 grow rounded-md border-0 bg-white px-2 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-1 focus:outline-primary-600 focus:ring-0 auto-dark:bg-white/5 auto-dark:text-white auto-dark:outline-white/10" placeholder="https://" aria-label="<%= link_label %>" data-form-components--rich-text-area-target="linkInput" data-action="keydown->form-components--rich-text-area#linkKeydown">
+      <div class="absolute top-12 left-2 z-20 flex w-80 max-w-[calc(100%-1rem)] items-center gap-2 rounded-xl bg-white p-2 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--rich-text-area-target="linkMenu">
+        <input type="url" class="block min-w-0 grow rounded-md border-0 bg-white px-2 py-1 text-sm text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-1 focus:outline-primary-600 focus:ring-0 auto-dark:bg-white/5 auto-dark:text-white auto-dark:outline-white/10" placeholder="https://" aria-label="<%= link_label %>" data-form-components--rich-text-area-target="linkInput" data-action="keydown->form-components--rich-text-area#linkKeydown">
         <button type="button" class="rounded-md bg-primary-600 px-2.5 py-1 text-sm font-semibold text-white hover:bg-primary-500" data-action="form-components--rich-text-area#applyLink"><%= apply_label %></button>
         <button type="button" class="<%= button_classes %>" title="<%= remove_link_label %>" aria-label="<%= remove_link_label %>" data-action="form-components--rich-text-area#removeLink">
-          <span class="fas fa-link-slash" aria-hidden="true"></span>
+          <%= icon("unlink") %>
         </button>
       </div>
     <% end %>
@@ -44,7 +54,7 @@
     <div data-form-components--rich-text-area-target="editor"></div>
     <%= input %>
     <% if has_error? %>
-      <div class="fas fa-circle-exclamation pointer-events-none absolute right-3 bottom-3 size-5 text-red-500 sm:size-4"></div>
+      <div class="fas fa-circle-exclamation pointer-events-none absolute right-3 bottom-3 size-5 text-red-500 sm:size-4" aria-hidden="true"></div>
     <% end %>
   </div>
   <% if description.present? %>

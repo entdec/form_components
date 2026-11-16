@@ -7,6 +7,7 @@ export default class extends CountryPicker {
 
   connect() {
     this.codes = new Map(this.countriesValue)
+    this.label = this.toggleTarget.getAttribute("aria-label")
     super.connect()
   }
 
@@ -19,7 +20,7 @@ export default class extends CountryPicker {
     super.updateToggle()
     const iso = this.countryValue
     this.codeTarget.textContent = `+${this.codes.get(iso)}`
-    this.toggleTarget.setAttribute("aria-label", `${this.names.get(iso)} +${this.codes.get(iso)}`)
+    this.toggleTarget.setAttribute("aria-label", `${this.label}: ${this.names.get(iso)} +${this.codes.get(iso)}`)
   }
 
   // A number typed or pasted with its code ("+44 20…", "0044 20…") picks

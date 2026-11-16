@@ -23,6 +23,9 @@ module FormComponents
       # Not for a signature there is already, which isn't sent again
       def required_attribute? = false
 
+      # Nor can the pad have aria-required
+      def required_in_label? = required?
+
       def attachment
         object.public_send(method) if object.respond_to?(method)
       end
@@ -47,9 +50,7 @@ module FormComponents
       end
 
       def field_label(id = tag_id, value: nil)
-        return if label == false
-
-        form.label(method, label.presence, for: "#{id}_pad", id: "#{id}_label")
+        super("#{id}_pad", id: "#{id}_label")
       end
 
       def read_only?

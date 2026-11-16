@@ -10,7 +10,7 @@ import { DirectUpload, Editor, Image, Placeholder, StarterKit, TextAlign } from 
 // image is an attachment (<action-text-attachment sgid="…">). A form
 // submitted while images are uploading waits for them and then goes on.
 export default class extends Controller {
-  static targets = ["editor", "input", "toolbar", "button", "heading", "linkMenu", "linkInput", "file"]
+  static targets = ["editor", "input", "toolbar", "button", "headingToggle", "headingMenu", "headingItem", "linkMenu", "linkInput", "file"]
   static values = {
     toolbar: Array,
     attributes: Object,
@@ -145,8 +145,45 @@ export default class extends Controller {
     commands[command]?.()
   }
 
+  // The heading menu: a button with a menu of paragraph and headings, its
+  // items one after another with the arrow keys, Escape back to the button
+
+  toggleHeadings(event) {
+    if (!this.headingMenuTarget.hidden) return this.closeHeadings({ focus: false })
+
+    this.headingMenuTarget.hidden = false
+    this.headingToggleTarget.setAttribute("aria-expanded", "true")
+    // From the keyboard (no click count), the focus to the current item
+    if (event.detail === 0) (this.headingItemTargets.find((item) => item.getAttribute("aria-pressed") === "true") || this.headingItemTargets[0]).focus()
+  }
+
+  closeHeadings({ focus = false } = {}) {
+    if (!this.hasHeadingMenuTarget || this.headingMenuTarget.hidden) return
+
+    this.headingMenuTarget.hidden = true
+    this.headingToggleTarget.setAttribute("aria-expanded", "false")
+    if (focus) this.headingToggleTarget.focus()
+  }
+
+  headingMenuKeydown(event) {
+    const items = this.headingItemTargets
+    const index = items.indexOf(event.target)
+    const next = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: items.length - 1 }[event.key]
+    if (next !== undefined) {
+      event.preventDefault()
+      items[(next + items.length) % items.length].focus()
+    } else if (event.key === "Escape") {
+      event.preventDefault()
+      event.stopPropagation()
+      this.closeHeadings({ focus: true })
+    } else if (event.key === "Tab") {
+      this.closeHeadings()
+    }
+  }
+
   heading(event) {
-    const level = Number(event.target.value)
+    const level = Number(event.currentTarget.dataset.level)
+    this.closeHeadings()
     const chain = this.editor.chain().focus()
     level ? chain.setHeading({ level }).run() : chain.setParagraph().run()
   }
@@ -179,11 +216,45 @@ export default class extends Controller {
       if (active[command]) button.setAttribute("aria-pressed", active[command]().toString())
       button.disabled = this.disabledValue || Boolean(disabled[command]?.())
     }
-    if (this.hasHeadingTarget) {
-      const level = [1, 2, 3].find((level) => editor.isActive("heading", { level }))
-      this.headingTarget.value = String(level || 0)
-      this.headingTarget.disabled = this.disabledValue
+    if (this.hasHeadingToggleTarget) {
+      const level = [1, 2, 3].find((level) => editor.isActive("heading", { level })) || 0
+      for (const item of this.headingItemTargets) item.setAttribute("aria-pressed", String(Number(item.dataset.level) === level))
+      this.headingToggleTarget.toggleAttribute("data-active", level > 0)
+      this.headingToggleTarget.disabled = this.disabledValue
     }
+    this.rove()
+  }
+
+  // The toolbar is one stop for Tab, its controls one after another with
+  // the arrow keys, Home and End, as WAI-ARIA's toolbar pattern
+
+  // The toolbar's own controls, not the heading menu's items
+  toolbarControls({ disabled = false } = {}) {
+    if (!this.hasToolbarTarget) return []
+    return [...this.toolbarTarget.querySelectorAll("button")]
+      .filter((control) => !this.headingItemTargets.includes(control) && (disabled || !control.disabled))
+  }
+
+  // The control that was last focused stays the toolbar's stop, unless it's
+  // disabled now: then the first one is
+  rove(current = this.toolbarControls().find((control) => control.tabIndex === 0)) {
+    const controls = this.toolbarControls()
+    const stop = controls.includes(current) ? current : controls[0]
+    for (const control of this.toolbarControls({ disabled: true })) control.tabIndex = control === stop ? 0 : -1
+  }
+
+  toolbarKeydown(event) {
+    const controls = this.toolbarControls()
+    const index = controls.indexOf(event.target)
+    if (index === -1) return
+
+    const next = { ArrowRight: index + 1, ArrowLeft: index - 1, Home: 0, End: controls.length - 1 }[event.key]
+    if (next === undefined) return
+
+    event.preventDefault()
+    const control = controls[(next + controls.length) % controls.length]
+    this.rove(control)
+    control.focus()
   }
 
   keydown(event) {
@@ -241,6 +312,7 @@ export default class extends Controller {
   }
 
   clickOutside(event) {
+    if (this.hasHeadingMenuTarget && !this.headingMenuTarget.parentElement.contains(event.target)) this.closeHeadings()
     if (this.hasLinkMenuTarget && !this.linkMenuTarget.contains(event.target) && !event.target.closest?.("[data-command=link]")) {
       this.closeLink({ focus: false })
     }

@@ -2,6 +2,30 @@
 
 ## Unreleased
 
+- Accessibility, as the W3C's forms tutorial has it: an input is described by
+  its errors and its description (both, no longer only the errors); a check
+  box's, radio button's and collection item's description is a paragraph
+  that describes it, no longer a second label; `aria-required` where the
+  label is marked but the browser doesn't check it, and "(required)" in the
+  label or legend where an input can't have it; `hide_label: true` for a
+  label for screen readers only; icons hidden from screen readers; a
+  rating's stars named "3 stars", a scale's end labels describing its ends;
+  the country field's button named by its label and the country; the
+  telephone field's country button says it's the country; the rich text
+  area's toolbar named and one Tab stop, with the arrow keys; the signature
+  field's menu a disclosure that gives the focus back; the color picker's
+  toggle and dialog named; the nested form's focus on the new item's field,
+  and on the add button after a remove; placeholders with enough contrast
+  (gray-500, gray-400 in dark mode).
+- The rich text area's toolbar looks like Tiptap's own editor's: light
+  buttons with Lucide's icons (vendored, ISC), the headings in a menu
+  instead of a select, and the image button saying "Add".
+- The code editor's gutter is part of the field: no band or hard border, its
+  line numbers muted, the current line marked only while it has the focus.
+- A switch's knob has a check when it's on and a cross when it's off.
+- `error_summary`: the form's errors above its fields, each a link to its
+  field, focused when there are errors.
+
 - `rich_text_area` (`rich_textarea`) is a Tiptap editor instead of Rails'
   Trix, for an Action Text attribute or one that holds HTML, with
   `toolbar:` (and `default_toolbar` for the app) and `placeholder:`. Images

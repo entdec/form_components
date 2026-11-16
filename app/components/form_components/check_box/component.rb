@@ -1,7 +1,8 @@
 module FormComponents
   module CheckBox
     # Rails' check box, with its hidden unchecked value; with switch: true it
-    # looks like a switch (role="switch"), still Rails' check box, without JS
+    # looks like a switch (role="switch"), still Rails' check box, without JS,
+    # its knob with a check when it's on and a cross when it's off
     class Component < FormComponents::Field::Component
       self.extras = superclass.extras + %i[switch]
 
@@ -29,6 +30,10 @@ module FormComponents
 
       # Not one of several, which would each have to be checked
       def required_attribute?
+        !html_options[:multiple] && super
+      end
+
+      def aria_required?
         !html_options[:multiple] && super
       end
 

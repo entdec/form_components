@@ -1,0 +1,13 @@
+<%= tag.div(**summary_attributes) do %>
+  <div class="flex">
+    <span class="fas fa-circle-xmark mt-0.5 shrink-0 text-red-500 auto-dark:text-red-400" aria-hidden="true"></span>
+    <div class="ml-3">
+      <h2 class="text-sm font-medium text-red-800 auto-dark:text-red-200" id="<%= heading_id %>"><%= heading %></h2>
+      <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-red-700 auto-dark:text-red-200/80">
+        <% errors.each do |message, id| %>
+          <li><%= id ? link_to(message, "##{id}", class: "underline hover:text-red-600 auto-dark:hover:text-red-100") : message %></li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>

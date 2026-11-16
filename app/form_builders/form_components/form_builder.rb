@@ -161,6 +161,12 @@ module FormComponents
     end
     alias_method :field_set, :fieldset
 
+    # The form's errors, each a link to its field, see ErrorSummary: title:
+    # its heading. Nothing without errors.
+    def error_summary(options = {})
+      FormComponents::ErrorSummary::Component.new(self, @object, options).render_in(@template)
+    end
+
     def submit(value = nil, options = {})
       FormComponents::Submit::Component.new(self, @object, value, options).render_in(@template)
     end

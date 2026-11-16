@@ -32,6 +32,8 @@ class FormBuilderTest < ComponentTest
     assert_includes form(post_class.new, validation_context: :publish).label(:body), "fa-asterisk"
   end
 
+  def required_attribute?(html) = Nokogiri::HTML5.fragment(html).css("[required]").any?
+
   test "an input the record must have filled in now is required, for the browser to check" do
     post_class = Class.new(Post) do
       def self.name = "Post"
@@ -42,22 +44,45 @@ class FormBuilderTest < ComponentTest
     end
     post = post_class.new
 
-    assert_includes form(post).text_field(:title), "required"
-    assert_not_includes form(post).text_field(:title, required: false), "required"
-    assert_not_includes form(post).text_area(:body), "required"
-    assert_includes form(post_class.new(listed: true)).text_area(:body), "required"
-    assert_includes form(post).email_field(:email), "required"
-    assert_not_includes form(post_class.new(listed: true)).email_field(:email), "required"
-    assert_not_includes form(post).text_field(:phone), "required"
+    assert required_attribute?(form(post).text_field(:title))
+    assert_not required_attribute?(form(post).text_field(:title, required: false))
+    assert_not required_attribute?(form(post).text_area(:body))
+    assert required_attribute?(form(post_class.new(listed: true)).text_area(:body))
+    assert required_attribute?(form(post).email_field(:email))
+    assert_not required_attribute?(form(post_class.new(listed: true)).email_field(:email))
+    assert_not required_attribute?(form(post).text_field(:phone))
 
     assert_equal 2, Nokogiri::HTML5.fragment(form(post).collection_radio_buttons(:kind, Post::KINDS.first(2), :first, :second)).css("input[type=radio][required]").size
     assert_equal 5, Nokogiri::HTML5.fragment(form(post).rating_field(:rating)).css("input[type=radio][required]").size
-    assert_includes form(post).check_box(:published), "required"
+    assert required_attribute?(form(post).check_box(:published))
     assert Nokogiri::HTML5.fragment(form(post).combobox(:city, Post::CITIES)).at_css("input[role=combobox][required]")
     # Not each of several check boxes, nor a file that may be there already
     assert_empty Nokogiri::HTML5.fragment(form(post).collection_check_boxes(:tags, Post::TAGS, :itself, :itself)).css("[required]")
-    assert_not_includes form(post).check_box(:tags, {multiple: true}, "ruby", nil), "required"
-    assert_not_includes form(post).file_field(:logo), "required"
+    assert_not required_attribute?(form(post).check_box(:tags, {multiple: true}, "ruby", nil))
+    assert_not required_attribute?(form(post).file_field(:logo))
+  end
+
+  test "an input required but not for the browser to check says so to screen readers" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      attr_accessor :listed
+      validates :body, presence: true, if: :listed
+      validates :tags, :logo, :kind, :country, presence: true
+    end
+    post = post_class.new
+    fragment = ->(html) { Nokogiri::HTML5.fragment(html) }
+
+    # aria-required, as its asterisk says, where the browser doesn't check it
+    assert fragment.call(form(post).text_area(:body)).at_css("textarea[aria-required=true]:not([required])")
+    assert_nil fragment.call(form(post).text_field(:title)).at_css("[aria-required]")
+    assert_nil fragment.call(form(post).text_area(:body, required: false)).at_css("[aria-required]")
+    # The label or legend says it where an input can't have aria-required
+    assert_equal "Logo (required)", fragment.call(form(post).file_field(:logo)).at_css("label").text
+    assert_equal "Country (required)", fragment.call(form(post).country_field(:country)).at_css("label").text
+    assert_equal "Tags (required)", fragment.call(form(post).collection_check_boxes(:tags, Post::TAGS, :itself, :itself)).at_css("legend").text
+    # Not where each radio button is required
+    assert_equal "Kind", fragment.call(form(post).collection_radio_buttons(:kind, Post::KINDS, :first, :second)).at_css("legend").text
+    assert_equal "Title", fragment.call(form(post).text_field(:title)).at_css("label").text
   end
 end
 

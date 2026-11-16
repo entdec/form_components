@@ -22,7 +22,7 @@ module FormComponents
       end
 
       def text_field_classes
-        class_names("block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:placeholder:text-gray-500",
+        class_names("block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-500 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:placeholder:text-gray-400",
           {"col-start-1 row-start-1 pl-10 pr-3" => leading_icon.present?},
           {"col-start-1 row-start-1 pr-3" => has_error?},
           {"outline-gray-300 focus:outline-primary-600 auto-dark:outline-white/10" => !has_error?},

@@ -47,10 +47,10 @@
 }
 
 .form-color-field .cp_input::placeholder {
-  color: var(--color-gray-400);
+  color: var(--color-gray-500);
 
   @variant auto-dark {
-    color: var(--color-gray-500);
+    color: var(--color-gray-400);
   }
 }
 

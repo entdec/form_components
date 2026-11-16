@@ -15,12 +15,12 @@
       <%= hidden_input %>
       <%= input %>
       <% if has_error? %>
-        <div class="fas fa-circle-exclamation pointer-events-none mr-3 size-5 shrink-0 self-center text-red-500 sm:size-4"></div>
+        <div class="fas fa-circle-exclamation pointer-events-none mr-3 size-5 shrink-0 self-center text-red-500 sm:size-4" aria-hidden="true"></div>
       <% end %>
     </div>
     <div class="absolute left-0 z-20 mt-2 w-full rounded-xl bg-white p-2 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--telephone-field-target="menu">
       <div class="grid grid-cols-1">
-        <input type="text" class="col-start-1 row-start-1 block w-full rounded-md border-0 bg-white py-1.5 pr-3 pl-9 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-1 focus:outline-primary-600 focus:ring-0 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:outline-white/10 auto-dark:placeholder:text-gray-500" placeholder="<%= search_placeholder %>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="<%= tag_id %>_countries" aria-label="<%= search_placeholder %>" data-form-components--telephone-field-target="search" data-action="input->form-components--telephone-field#filter keydown->form-components--telephone-field#searchKeydown">
+        <input type="text" class="col-start-1 row-start-1 block w-full rounded-md border-0 bg-white py-1.5 pr-3 pl-9 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-1 focus:outline-primary-600 focus:ring-0 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:outline-white/10 auto-dark:placeholder:text-gray-400" placeholder="<%= search_placeholder %>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="<%= tag_id %>_countries" aria-label="<%= search_placeholder %>" data-form-components--telephone-field-target="search" data-action="input->form-components--telephone-field#filter keydown->form-components--telephone-field#searchKeydown">
         <span class="fas fa-magnifying-glass pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-gray-400" aria-hidden="true"></span>
       </div>
       <ul id="<%= tag_id %>_countries" role="listbox" aria-label="<%= country_label %>" class="mt-2 max-h-72 overflow-y-auto" data-form-components--telephone-field-target="list" data-action="click->form-components--telephone-field#pick mousemove->form-components--telephone-field#hover"></ul>

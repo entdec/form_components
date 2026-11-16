@@ -67,9 +67,11 @@ export default class extends Controller {
     return li
   }
 
+  // Only options are allowed in a listbox: the line is for the eye
   separator() {
     const li = document.createElement("li")
-    li.setAttribute("role", "separator")
+    li.setAttribute("role", "none")
+    li.dataset.separator = ""
     li.className = "mx-2 my-1 border-t border-gray-200 auto-dark:border-white/10"
     return li
   }
@@ -114,7 +116,7 @@ export default class extends Controller {
   filter() {
     const query = this.normalize(this.searchTarget.value.trim())
     for (const li of this.listTarget.children) {
-      li.hidden = query !== "" && (li.getAttribute("role") === "separator" || !li.dataset.search.includes(query))
+      li.hidden = query !== "" && ("separator" in li.dataset || !li.dataset.search.includes(query))
     }
     if (!this.active || this.active.hidden) this.activate(this.visibleOptions()[0])
   }

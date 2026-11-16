@@ -65,6 +65,15 @@ module FormComponents
         form.field_name(method, index: id_options.fetch(:index, form.options[:index]))
       end
 
+      # The mark of a required attribute's label or legend, hidden from screen
+      # readers; with required_text: true also the word, for them
+      def asterisk(required_text: false)
+        safe_join([
+          tag.span(class: "fas fa-asterisk fa-xs text-red-500 ml-1", aria: {hidden: true}),
+          (tag.span(" #{I18n.t("form_components.required", default: "(required)")}", class: "sr-only") if required_text)
+        ])
+      end
+
       private
 
       # As Rails makes a value part of an id

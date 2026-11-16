@@ -35,19 +35,17 @@ module FormComponents
       def input
         given = input_options("pointer-events-none absolute bottom-0 left-1/2 size-px resize-none opacity-0", from: html_options.except(:class))
         data = (html_options[:data] || {}).symbolize_keys
-        rails(:text_area, method, given.except(:"aria-invalid", :"aria-describedby").merge(tabindex: -1, "aria-hidden": "true",
+        rails(:text_area, method, given.except(:"aria-invalid", :"aria-describedby", :"aria-required").merge(tabindex: -1, "aria-hidden": "true",
           data: data.merge("form-components--code-editor-target": "input", action: "focus->form-components--code-editor#focus invalid->form-components--code-editor#focus")))
       end
 
       def field_label(id = tag_id, value: nil)
-        return if label == false
-
-        form.label(method, label.presence, for: id, id: "#{id}_label")
+        super(id, id: "#{id}_label")
       end
 
       # The editor's own attributes, for the controller to give its content
       def editor_attributes
-        required = html_options.key?(:required) ? html_options[:required] : required_attribute?
+        required = html_options.key?(:required) ? html_options[:required] : required?
         {
           id: "#{tag_id}_editor", "aria-labelledby": ("#{tag_id}_label" unless label == false), "aria-describedby": aria_described_by,
           "aria-invalid": aria_invalid, "aria-required": ("true" if required)

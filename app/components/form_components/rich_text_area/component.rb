@@ -9,8 +9,9 @@ module FormComponents
     # browser checks it when it's required, and it hands its focus to the
     # editor. So like the color field it needs JS.
     #
-    # toolbar: the buttons, as names from BUTTONS and :heading (a select of
-    # paragraph and headings), with :| between groups; false for none. The
+    # toolbar: the buttons, as names from BUTTONS and :heading (a menu of
+    # paragraph and headings), with :| between groups; false for none. Their
+    # icons are Lucide's (app/assets/images/form_components/icons). The
     # editor allows only the formatting they have, also when pasting or typing
     # Markdown. :image uploads an image with Active Storage's direct uploads,
     # also when one is pasted or dropped, and only when the host has Active
@@ -24,17 +25,22 @@ module FormComponents
       # The buttons of every rich text area, unless toolbar: is given
       class_attribute :default_toolbar, default: %i[heading | bold italic underline strike | link | bullet_list ordered_list blockquote | image | undo redo]
 
-      # Each button's icon (Font Awesome)
+      # Each button's icon
       BUTTONS = {
-        bold: "fas fa-bold", italic: "fas fa-italic", underline: "fas fa-underline", strike: "fas fa-strikethrough",
-        code: "fas fa-code", link: "fas fa-link", bullet_list: "fas fa-list-ul", ordered_list: "fas fa-list-ol",
-        blockquote: "fas fa-quote-right", code_block: "fas fa-file-code", horizontal_rule: "fas fa-minus",
-        align_left: "fas fa-align-left", align_center: "fas fa-align-center", align_right: "fas fa-align-right",
-        align_justify: "fas fa-align-justify", image: "fas fa-image", undo: "fas fa-rotate-left", redo: "fas fa-rotate-right"
+        bold: "bold", italic: "italic", underline: "underline", strike: "strikethrough",
+        code: "code", link: "link", bullet_list: "list", ordered_list: "list-ordered",
+        blockquote: "text-quote", code_block: "square-code", horizontal_rule: "minus",
+        align_left: "align-left", align_center: "align-center", align_right: "align-right",
+        align_justify: "align-justify", image: "image-plus", undo: "undo-2", redo: "redo-2"
       }.freeze
 
-      # The heading levels of the :heading select
+      # The heading levels of the :heading menu
       HEADING_LEVELS = [1, 2, 3].freeze
+
+      # The icons' SVGs, read once, without their license comment
+      SVGS = Hash.new do |svgs, name|
+        svgs[name] = FormComponents::Engine.root.join("app/assets/images/form_components/icons/#{name}.svg").read.sub(/\A<!--.*?-->/, "").strip
+      end
 
       # Next to the label, above the field
       option_reader :corner_hint
@@ -67,7 +73,11 @@ module FormComponents
 
       def paragraph_label = I18n.t("form_components.rich_text_area.paragraph", default: "Paragraph")
 
+      def toolbar_label = I18n.t("form_components.rich_text_area.toolbar", default: "Formatting")
+
       def link_label = I18n.t("form_components.rich_text_area.url", default: "URL")
+
+      def add_image_label = I18n.t("form_components.rich_text_area.add", default: "Add")
 
       def apply_label = I18n.t("form_components.rich_text_area.apply", default: "Apply")
 
@@ -110,19 +120,17 @@ module FormComponents
       def input
         given = input_options("pointer-events-none absolute bottom-0 left-1/2 size-px resize-none opacity-0", from: html_options.except(:class, :data, :value))
         data = (html_options[:data] || {}).symbolize_keys.except(:direct_upload_url, :blob_url_template)
-        rails(:text_area, method, given.except(:"aria-invalid", :"aria-describedby").merge(value: value, tabindex: -1, "aria-hidden": "true",
+        rails(:text_area, method, given.except(:"aria-invalid", :"aria-describedby", :"aria-required").merge(value: value, tabindex: -1, "aria-hidden": "true",
           data: data.merge("form-components--rich-text-area-target": "input", action: "focus->form-components--rich-text-area#focus invalid->form-components--rich-text-area#focus")))
       end
 
       def field_label(id = tag_id, value: nil)
-        return if label == false
-
-        form.label(method, label.presence, for: id, id: "#{id}_label")
+        super(id, id: "#{id}_label")
       end
 
       # The editor's own attributes, for the controller to give it
       def editor_attributes
-        required = html_options.key?(:required) ? html_options[:required] : required_attribute?
+        required = html_options.key?(:required) ? html_options[:required] : required?
         {
           id: "#{tag_id}_editor", role: "textbox", "aria-multiline": "true",
           "aria-labelledby": ("#{tag_id}_label" unless label == false), "aria-describedby": aria_described_by,
@@ -151,9 +159,22 @@ module FormComponents
           {"outline-red-300 focus-within:outline-red-600 auto-dark:outline-red-500/50" => has_error?})
       end
 
+      # Light buttons with an icon, as Tiptap's own editor has them; pressed
+      # when their formatting is on, the heading menu's while a heading is
       def button_classes
-        "flex size-7 items-center justify-center rounded-md text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-40 aria-pressed:bg-primary-50 aria-pressed:text-primary-700 auto-dark:text-gray-300 auto-dark:hover:bg-white/10 auto-dark:hover:text-white auto-dark:aria-pressed:bg-white/15 auto-dark:aria-pressed:text-white"
+        "flex h-8 min-w-8 shrink-0 items-center justify-center gap-1.5 rounded-lg px-1.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-600 disabled:pointer-events-none disabled:opacity-40 aria-expanded:bg-gray-100 aria-expanded:text-gray-900 aria-pressed:bg-primary-50 aria-pressed:text-primary-700 data-active:bg-primary-50 data-active:text-primary-700 auto-dark:text-gray-400 auto-dark:hover:bg-white/10 auto-dark:hover:text-white auto-dark:aria-expanded:bg-white/10 auto-dark:aria-expanded:text-white auto-dark:aria-pressed:bg-white/10 auto-dark:aria-pressed:text-white auto-dark:data-active:bg-white/10 auto-dark:data-active:text-white"
       end
+
+      def menu_item_classes
+        "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-left text-sm text-gray-700 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none aria-pressed:font-semibold aria-pressed:text-gray-900 auto-dark:text-gray-200 auto-dark:hover:bg-white/10 auto-dark:focus-visible:bg-white/10 auto-dark:aria-pressed:text-white"
+      end
+
+      # A Lucide icon, in the page so it takes the text's colour
+      def icon(name, classes = "size-[1.125rem] shrink-0")
+        SVGS[name].sub("<svg", %(<svg class="#{classes}" aria-hidden="true" focusable="false")).html_safe
+      end
+
+      def heading_icon(level) = level.zero? ? "pilcrow" : "heading-#{level}"
 
       private
 

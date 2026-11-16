@@ -15,6 +15,9 @@ module FormComponents
       # Not for a file there is already, which isn't sent again
       def required_attribute? = false
 
+      # A file field can't have aria-required
+      def required_in_label? = required?
+
       def input
         rails(:file_field, method, input_options(file_field_classes))
       end
