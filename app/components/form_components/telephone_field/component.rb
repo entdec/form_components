@@ -95,7 +95,9 @@ module FormComponents
       end
 
       def wrapper_classes
-        class_names("flex rounded-md bg-white outline outline-1 -outline-offset-1 focus-within:outline-2 focus-within:-outline-offset-1 auto-dark:bg-white/5",
+        class_names("flex bg-white outline outline-1 -outline-offset-1 focus-within:outline-2 focus-within:-outline-offset-1 auto-dark:bg-white/5",
+          corner_classes,
+          {"focus-within:relative" => grouped?, "relative" => grouped? && has_error?},
           {"outline-gray-300 focus-within:outline-primary-600 auto-dark:outline-white/10" => !has_error?},
           {"outline-red-300 focus-within:outline-red-600 auto-dark:outline-red-500/50" => has_error?})
       end

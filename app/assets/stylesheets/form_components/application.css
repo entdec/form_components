@@ -3,6 +3,7 @@
 @import "../../../components/form_components/code_editor/component.css";
 @import "../../../components/form_components/color_field/component.css";
 @import "../../../components/form_components/combobox/component.css";
+@import "../../../components/form_components/field_group/component.css";
 @import "../../../components/form_components/rich_text_area/component.css";
 
 /* Rails wraps a field with errors (ActionView::Base.field_error_proc, by

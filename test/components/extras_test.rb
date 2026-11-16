@@ -230,28 +230,49 @@ class MoneyFieldTest < ComponentTest
     Nokogiri::HTML5.fragment(form(post).money_field(:price, **options))
   end
 
-  test "the amount, the currency's symbol before it and the currency picked at its end" do
+  def picker(html, name) = JSON.parse(html.at_css("[data-controller]")["data-form-components--money-field-#{name}-value"])
+
+  test "the currency picked at the start, by its symbol, sent in a hidden field, then the amount" do
     html = field(currencies: %w[EUR USD])
 
     assert html.at_css("label[for=post_price]", text: "Price")
     assert_equal "12.50", html.at_css("input#post_price[name='post[price]'][inputmode=decimal]")["value"]
     assert_equal "0.00", html.at_css("input#post_price")["placeholder"]
-    assert html.at_css("select#post_price_currency[name='post[price_currency]'][aria-label=Currency] option[value=USD][selected]")
-    assert_equal "$", html.at_css("[data-form-components--money-field-target=symbol][aria-hidden=true]").text
-    assert_equal({"EUR" => "€", "USD" => "$"}, JSON.parse(html.at_css("[data-controller='form-components--money-field']")["data-form-components--money-field-symbols-value"]))
+    assert html.at_css("input[type=hidden][name='post[price_currency]'][value=USD]#post_price_currency")
+    assert_equal "$", html.at_css("button[aria-haspopup=listbox][aria-label=Currency] [data-form-components--money-field-target=display]").text
+    assert_equal [["eur", "€"], ["usd", "$"]], picker(html, "countries")
+    assert_equal "usd", html.at_css("[data-controller]")["data-form-components--money-field-country-value"]
+    assert_equal %w[eur usd], picker(html, "priority")
+    assert html.at_css("ul#post_price_currencies[role=listbox]")
   end
 
-  test "without a currency, the default one; choices as Rails' select's" do
-    html = field(Post.new, currencies: [["Euro", "EUR"], ["Yen", "JPY"]])
-    assert html.at_css("option[value=EUR][selected]", text: "Euro")
-    assert_equal "€", html.at_css("[data-form-components--money-field-target=symbol]").text
+  test "by its code, with currency_display: :code" do
+    html = field(currencies: %w[EUR USD], currency_display: :code)
 
-    assert field(Post.new, currencies: %w[EUR JPY], default_currency: "jpy").at_css("option[value=JPY][selected]")
+    assert_equal "USD", html.at_css("[data-form-components--money-field-target=display]").text
+    assert_equal [["eur", "EUR"], ["usd", "USD"]], picker(html, "countries")
+  end
+
+  test "without a currency, the default one; the record's, also when it isn't one to pick" do
+    assert_equal "€", field(Post.new, currencies: %w[EUR JPY]).at_css("[data-form-components--money-field-target=display]").text
+    assert field(Post.new, currencies: %w[EUR JPY], default_currency: "jpy").at_css("input[type=hidden][value=JPY]")
     assert_equal "0", field(Post.new, currencies: %w[EUR JPY], default_currency: "JPY").at_css("input#post_price")["placeholder"]
+    assert_equal %w[eur usd], picker(field(currencies: %w[EUR]), "countries").map(&:first)
+  end
+
+  test "a fixed currency: shown, describing the amount, and sent in a hidden field" do
+    html = field(fixed_currency: true, description: "Excluding VAT")
+
+    assert_nil html.at_css("button")
+    assert_nil html.at_css("[data-controller]")
+    assert_equal "$", html.at_css("span#post_price_currency_display").text
+    assert html.at_css("input[type=hidden][name='post[price_currency]'][value=USD]#post_price_currency")
+    assert html.at_css("input#post_price[aria-describedby='post_price_description post_price_currency_display']")
+    assert field(Post.new, fixed_currency: true).at_css("input[type=hidden][name='post[price_currency]'][value=EUR]")
   end
 
   test "all of the money gem's currencies, unless given" do
-    assert_operator field.css("select option").size, :>, 100
+    assert_operator picker(field, "countries").size, :>, 100
   end
 
   test "another attribute for the currency" do
@@ -260,7 +281,7 @@ class MoneyFieldTest < ComponentTest
       attribute :currency, :string
     end
     html = field(post_class.new(currency: "GBP"), currencies: %w[EUR GBP], currency_method: :currency)
-    assert html.at_css("select[name='post[currency]'] option[value=GBP][selected]")
+    assert html.at_css("input[type=hidden][name='post[currency]'][value=GBP]")
   end
 
   test "the currency's errors with the amount's" do
@@ -271,7 +292,60 @@ class MoneyFieldTest < ComponentTest
 
     assert_equal "is not a number, is not supported", html.at_css("#post_price_error").text
     assert html.at_css("input#post_price[aria-invalid=true][aria-describedby=post_price_error]")
-    assert html.at_css("select[aria-invalid=true]")
+  end
+end
+
+class FieldGroupTest < ComponentTest
+  def group(post = Post.new, **options)
+    builder = form(post)
+    Nokogiri::HTML5.fragment(builder.field_group("Card details", **options) do
+      builder.text_field(:card_number, placeholder: "Card number") +
+        builder.field_row { builder.text_field(:card_expiry, description: "As on the card") + builder.select(:card_cvc, %w[1 2]) }
+    end)
+  end
+
+  test "the fields in a fieldset with its legend, beside each other in a row, their labels for screen readers only" do
+    html = group(description: "Never stored")
+
+    assert html.at_css("fieldset.form-group[aria-describedby] > legend", text: "Card details")
+    assert html.at_css(".form-group__fields > .form-component input#post_card_number")
+    assert_equal %w[post_card_expiry post_card_cvc], html.css(".form-group__fields > .form-group__row > .form-component").map { |field| field.at_css("input, select")["id"] }
+    assert html.at_css("label.sr-only[for=post_card_number]", text: "Card number")
+    assert html.at_css("label.sr-only[for=post_card_cvc]")
+    assert html.at_css("p", text: "Never stored")
+  end
+
+  test "the fields' corners and outlines the group's" do
+    html = group
+    assert_includes html.at_css("input#post_card_number")["class"], "rounded-tl-(--form-group-tl)"
+    assert_includes html.at_css("select#post_card_cvc")["class"], "focus:relative"
+    refute_includes html.at_css("input#post_card_number")["class"], "rounded-md"
+    refute_includes Nokogiri::HTML5.fragment(form.text_field(:card_number)).at_css("input")["class"], "rounded-tl-(--form-group-tl)"
+  end
+
+  test "the fields' descriptions and errors below the group, still describing them" do
+    post = Post.new
+    post.errors.add(:card_cvc, "is invalid")
+    html = group(post)
+
+    assert_equal 1, html.css("#post_card_expiry_description").size
+    assert html.at_css("fieldset > p#post_card_expiry_description", text: "As on the card")
+    assert html.at_css("input#post_card_expiry[aria-describedby=post_card_expiry_description]")
+    assert html.at_css("fieldset > p#post_card_cvc_error", text: "is invalid")
+    assert html.at_css("select#post_card_cvc[aria-describedby=post_card_cvc_error]")
+  end
+
+  test "the legend marked when a field is required, and fields after the group as ever" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :card_number, presence: true
+    end
+    builder = form(post_class.new)
+    html = Nokogiri::HTML5.fragment(builder.field_group("Card") { builder.text_field(:card_number) } + builder.text_field(:title))
+
+    assert html.at_css("legend .fa-asterisk[aria-hidden=true]")
+    assert_nil builder.grouped_fields
+    assert html.at_css("label[for=post_title]:not(.sr-only)")
   end
 end
 

@@ -34,6 +34,10 @@ module FormComponents
       end
     end
 
+    # The fields of the field group being built, which they add themselves
+    # to, or nil
+    attr_reader :grouped_fields
+
     # Rails' text fields of every kind, as TextField
     TEXT_FIELDS = %i[text_field password_field search_field date_field time_field
       datetime_field datetime_local_field month_field week_field url_field email_field number_field].freeze
@@ -167,6 +171,24 @@ module FormComponents
       FormComponents::Fieldset::Component.new(legend, options).render_in(@template, &block)
     end
     alias_method :field_set, :fieldset
+
+    # Fields in one box, see FieldGroup: as Rails' field_set_tag, with
+    # description:, each field below the one before, or in a field_row
+    # beside each other
+    def field_group(legend = nil, options = {}, &block)
+      previous, @grouped_fields = @grouped_fields, []
+      content = begin
+        @template.capture(&block)
+      ensure
+        fields, @grouped_fields = @grouped_fields, previous
+      end
+      FormComponents::FieldGroup::Component.new(legend, fields, options).render_in(@template) { content }
+    end
+
+    # Fields beside each other in a field group
+    def field_row(&block)
+      @template.tag.div(class: "form-group__row", &block)
+    end
 
     # The form's errors, each a link to its field, see ErrorSummary: title:
     # its heading. Nothing without errors.

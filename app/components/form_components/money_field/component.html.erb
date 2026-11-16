@@ -5,20 +5,38 @@
       <span class="text-sm/6 text-gray-500 auto-dark:text-gray-400"><%= corner_hint %></span>
     </div>
   <% end %>
-  <%= tag.div class: class_names("mt-2", wrapper_classes), data: {controller: "form-components--money-field", "form-components--money-field-symbols-value": symbols.to_json} do %>
-    <% if symbols.any? %>
-      <span class="shrink-0 select-none pl-3 text-base text-gray-500 sm:text-sm/6 auto-dark:text-gray-400" aria-hidden="true" data-form-components--money-field-target="symbol"><%= symbol %></span>
+  <%= tag.div class: class_names("relative", "mt-2" => !grouped?), data: (picker_data unless fixed_currency) do %>
+    <div class="<%= wrapper_classes %>">
+      <% if fixed_currency %>
+        <span class="flex shrink-0 items-center <%= corner_classes(:left) %> border-r border-gray-300 py-1.5 pr-3 pl-3 text-base text-gray-500 select-none sm:text-sm/6 auto-dark:border-white/10 auto-dark:text-gray-400" id="<%= tag_id %>_currency_display"><%= display(selected_currency) %></span>
+      <% else %>
+        <button type="button" class="flex shrink-0 items-center gap-2 <%= corner_classes(:left) %> border-r border-gray-300 py-1.5 pr-2.5 pl-3 text-base text-gray-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed sm:text-sm/6 auto-dark:border-white/10 auto-dark:text-white" aria-haspopup="listbox" aria-expanded="false" aria-label="<%= currency_label %>" <%= "disabled" if html_options[:disabled] %> data-form-components--money-field-target="toggle" data-action="form-components--money-field#toggle keydown->form-components--money-field#toggleKeydown">
+          <span data-form-components--money-field-target="display"><%= display(selected_currency) %></span>
+          <span class="fas fa-chevron-down text-xs text-gray-400" aria-hidden="true"></span>
+        </button>
+      <% end %>
+      <%= currency_hidden_input %>
+      <%= input %>
+      <% if has_error? %>
+        <div class="fas fa-circle-exclamation pointer-events-none mr-3 size-5 shrink-0 self-center text-red-500 sm:size-4" aria-hidden="true"></div>
+      <% end %>
+    </div>
+    <% unless fixed_currency %>
+      <div class="absolute left-0 z-20 mt-2 w-full rounded-xl bg-white p-2 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--money-field-target="menu">
+        <div class="grid grid-cols-1">
+          <input type="text" class="col-start-1 row-start-1 block w-full rounded-md border-0 bg-white py-1.5 pr-3 pl-9 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-1 focus:outline-primary-600 focus:ring-0 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:outline-white/10 auto-dark:placeholder:text-gray-400" placeholder="<%= search_placeholder %>" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="<%= tag_id %>_currencies" aria-label="<%= search_placeholder %>" data-form-components--money-field-target="search" data-action="input->form-components--money-field#filter keydown->form-components--money-field#searchKeydown">
+          <span class="fas fa-magnifying-glass pointer-events-none col-start-1 row-start-1 ml-3 size-4 self-center text-gray-400" aria-hidden="true"></span>
+        </div>
+        <ul id="<%= tag_id %>_currencies" role="listbox" aria-label="<%= currency_label %>" class="mt-2 max-h-72 overflow-y-auto" data-form-components--money-field-target="list" data-action="click->form-components--money-field#pick mousemove->form-components--money-field#hover"></ul>
+      </div>
     <% end %>
-    <%= input %>
+  <% end %>
+  <% unless grouped? %>
+    <% if description.present? %>
+      <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+    <% end %>
     <% if has_error? %>
-      <div class="fas fa-circle-exclamation pointer-events-none size-5 shrink-0 text-red-500 sm:size-4" aria-hidden="true"></div>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
     <% end %>
-    <%= currency_select %>
-  <% end %>
-  <% if description.present? %>
-    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
-  <% end %>
-  <% if has_error? %>
-    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
   <% end %>
 </div>

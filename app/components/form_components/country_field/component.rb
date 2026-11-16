@@ -61,7 +61,9 @@ module FormComponents
       end
 
       def toggle_classes
-        class_names("flex w-full items-center gap-2 rounded-md bg-white py-1.5 pr-3 pl-3 text-left text-base outline outline-1 -outline-offset-1 focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:cursor-not-allowed sm:text-sm/6 auto-dark:bg-white/5",
+        class_names("flex w-full items-center gap-2 bg-white py-1.5 pr-3 pl-3 text-left text-base outline outline-1 -outline-offset-1 focus-visible:outline-2 focus-visible:-outline-offset-1 disabled:cursor-not-allowed sm:text-sm/6 auto-dark:bg-white/5",
+          corner_classes,
+          {"focus-visible:relative" => grouped?, "relative" => grouped? && has_error?},
           {"text-gray-900 outline-gray-300 focus-visible:outline-primary-600 auto-dark:text-white auto-dark:outline-white/10" => !has_error?},
           {"text-red-900 outline-red-300 focus-visible:outline-red-600 auto-dark:text-red-300 auto-dark:outline-red-500/50" => has_error?})
       end

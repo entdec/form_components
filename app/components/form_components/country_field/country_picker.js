@@ -6,7 +6,8 @@ import { Controller } from "@hotwired/stimulus"
 //
 // countries: [iso, detail] each, the detail ("31", a calling code) shown as
 // "+31" after its name, if there is one. A subclass shows the pick in its
-// toggle (updateToggle) and does what picking means (picked).
+// toggle (updateToggle) and does what picking means (picked); it can pick
+// other codes, such as currencies, with namesType, icon and detailText.
 export default class extends Controller {
   static targets = ["toggle", "flag", "menu", "search", "list"]
   static values = { countries: Array, priority: Array, country: String, locale: String }
@@ -36,11 +37,28 @@ export default class extends Controller {
 
   displayNames() {
     try {
-      const names = new Intl.DisplayNames([this.localeValue || "en", "en"], { type: "region" })
+      const names = new Intl.DisplayNames([this.localeValue || "en", "en"], { type: this.namesType })
       return (iso) => names.of(iso.toUpperCase()) || iso.toUpperCase()
     } catch {
       return (iso) => iso.toUpperCase()
     }
+  }
+
+  // The kind of names of the codes, Intl.DisplayNames' type
+  get namesType() {
+    return "region"
+  }
+
+  // Before an option's name: the country's flag
+  icon(iso) {
+    const flag = document.createElement("span")
+    flag.className = `fi fi-${iso} shrink-0 rounded-xs`
+    return flag
+  }
+
+  // After an option's name: its detail, a calling code
+  detailText(detail) {
+    return `+${detail}`
   }
 
   option({ iso, detail, name }) {
@@ -49,19 +67,18 @@ export default class extends Controller {
     li.setAttribute("role", "option")
     li.setAttribute("aria-selected", "false")
     li.dataset.country = iso
-    li.dataset.search = `${this.normalize(name)} ${iso}${detail ? ` +${detail}` : ""}`
+    li.dataset.search = `${this.normalize(name)} ${iso}${detail ? ` ${this.detailText(detail)}` : ""}`
     li.className = "flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 text-base text-gray-900 select-none aria-selected:font-semibold data-active:bg-gray-100 sm:text-sm/6 auto-dark:text-white auto-dark:data-active:bg-white/10"
 
-    const flag = document.createElement("span")
-    flag.className = `fi fi-${iso} shrink-0 rounded-xs`
+    const icon = this.icon(iso)
     const label = document.createElement("span")
     label.className = "grow truncate"
     label.textContent = name
-    li.append(flag, label)
+    li.append(...(icon ? [icon] : []), label)
     if (detail) {
       const dial = document.createElement("span")
       dial.className = "text-gray-500 auto-dark:text-gray-400"
-      dial.textContent = `+${detail}`
+      dial.textContent = this.detailText(detail)
       li.append(dial)
     }
     return li
@@ -185,7 +202,7 @@ export default class extends Controller {
   // The flag of the country picked, none without one, and the pick in the list
   updateToggle() {
     const iso = this.countryValue
-    this.flagTarget.className = iso ? `fi fi-${iso} rounded-xs` : "hidden"
+    if (this.hasFlagTarget) this.flagTarget.className = iso ? `fi fi-${iso} rounded-xs` : "hidden"
     for (const li of this.listTarget.querySelectorAll("[role=option]")) {
       li.setAttribute("aria-selected", li.dataset.country === iso ? "true" : "false")
     }

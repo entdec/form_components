@@ -5,9 +5,9 @@
       <span class="text-sm/6 text-gray-500 auto-dark:text-gray-400"><%= corner_hint %></span>
     </div>
   <% end %>
-  <%= tag.div class: "relative mt-2", data: {controller: "form-components--telephone-field", "form-components--telephone-field-countries-value": countries.to_json, "form-components--telephone-field-priority-value": priority_countries.to_json, "form-components--telephone-field-country-value": selected_country, "form-components--telephone-field-locale-value": I18n.locale, action: "click@document->form-components--telephone-field#clickOutside"} do %>
+  <%= tag.div class: class_names("relative", "mt-2" => !grouped?), data: {controller: "form-components--telephone-field", "form-components--telephone-field-countries-value": countries.to_json, "form-components--telephone-field-priority-value": priority_countries.to_json, "form-components--telephone-field-country-value": selected_country, "form-components--telephone-field-locale-value": I18n.locale, action: "click@document->form-components--telephone-field#clickOutside"} do %>
     <div class="<%= wrapper_classes %>">
-      <button type="button" class="flex shrink-0 items-center gap-2 rounded-l-md border-r border-gray-300 py-1.5 pr-2.5 pl-3 text-base text-gray-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed sm:text-sm/6 auto-dark:border-white/10 auto-dark:text-white" aria-haspopup="listbox" aria-expanded="false" aria-label="<%= country_label %>" <%= "disabled" if html_options[:disabled] %> data-form-components--telephone-field-target="toggle" data-action="form-components--telephone-field#toggle keydown->form-components--telephone-field#toggleKeydown">
+      <button type="button" class="flex shrink-0 items-center gap-2 <%= corner_classes(:left) %> border-r border-gray-300 py-1.5 pr-2.5 pl-3 text-base text-gray-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed sm:text-sm/6 auto-dark:border-white/10 auto-dark:text-white" aria-haspopup="listbox" aria-expanded="false" aria-label="<%= country_label %>" <%= "disabled" if html_options[:disabled] %> data-form-components--telephone-field-target="toggle" data-action="form-components--telephone-field#toggle keydown->form-components--telephone-field#toggleKeydown">
         <span class="fi fi-<%= selected_country %> rounded-xs" data-form-components--telephone-field-target="flag"></span>
         <span data-form-components--telephone-field-target="code">+<%= calling_code %></span>
         <span class="fas fa-chevron-down text-xs text-gray-400" aria-hidden="true"></span>
@@ -26,10 +26,12 @@
       <ul id="<%= tag_id %>_countries" role="listbox" aria-label="<%= country_label %>" class="mt-2 max-h-72 overflow-y-auto" data-form-components--telephone-field-target="list" data-action="click->form-components--telephone-field#pick mousemove->form-components--telephone-field#hover"></ul>
     </div>
   <% end %>
-  <% if description.present? %>
-    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
-  <% end %>
-  <% if has_error? %>
-    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% unless grouped? %>
+    <% if description.present? %>
+      <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+    <% end %>
+    <% if has_error? %>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+    <% end %>
   <% end %>
 </div>

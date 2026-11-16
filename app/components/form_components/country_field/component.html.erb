@@ -5,7 +5,7 @@
       <span class="text-sm/6 text-gray-500 auto-dark:text-gray-400"><%= corner_hint %></span>
     </div>
   <% end %>
-  <%= tag.div class: "relative mt-2", data: {controller: "form-components--country-field", "form-components--country-field-countries-value": COUNTRIES.map { |iso| [iso, nil] }.to_json, "form-components--country-field-priority-value": priority_countries.to_json, "form-components--country-field-country-value": country.to_s, "form-components--country-field-placeholder-value": placeholder, "form-components--country-field-locale-value": I18n.locale, action: "click@document->form-components--country-field#clickOutside"} do %>
+  <%= tag.div class: class_names("relative", "mt-2" => !grouped?), data: {controller: "form-components--country-field", "form-components--country-field-countries-value": COUNTRIES.map { |iso| [iso, nil] }.to_json, "form-components--country-field-priority-value": priority_countries.to_json, "form-components--country-field-country-value": country.to_s, "form-components--country-field-placeholder-value": placeholder, "form-components--country-field-locale-value": I18n.locale, action: "click@document->form-components--country-field#clickOutside"} do %>
     <%= hidden_input %>
     <%= tag.button(**toggle_attributes) do %>
       <span class="<%= country ? "fi fi-#{country} rounded-xs" : "hidden" %>" data-form-components--country-field-target="flag"></span>
@@ -25,10 +25,12 @@
       <ul id="<%= tag_id %>_countries" role="listbox" aria-label="<%= human_attribute_name %>" class="mt-2 max-h-72 overflow-y-auto" data-form-components--country-field-target="list" data-action="click->form-components--country-field#pick mousemove->form-components--country-field#hover"></ul>
     </div>
   <% end %>
-  <% if description.present? %>
-    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
-  <% end %>
-  <% if has_error? %>
-    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% unless grouped? %>
+    <% if description.present? %>
+      <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+    <% end %>
+    <% if has_error? %>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+    <% end %>
   <% end %>
 </div>

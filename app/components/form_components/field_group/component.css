@@ -1,0 +1,45 @@
+/* A field group's fields (FieldGroup): each below the one before, or in a
+   row beside each other, each field's outline on its neighbour's. The
+   fields' corners are the box's: rounded where they're the box's corners,
+   with the --form-group-* their classes take (Field#corner_classes). */
+.form-group__fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group__fields > * + * {
+  margin-top: -1px;
+}
+
+.form-group__row {
+  display: flex;
+}
+
+.form-group__row > * {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+.form-group__row > * + * {
+  margin-left: -1px;
+}
+
+.form-group__fields > :first-child {
+  --form-group-tl: var(--radius-md, 0.375rem);
+  --form-group-tr: var(--radius-md, 0.375rem);
+}
+
+.form-group__fields > :last-child {
+  --form-group-bl: var(--radius-md, 0.375rem);
+  --form-group-br: var(--radius-md, 0.375rem);
+}
+
+.form-group__row > :not(:first-child) {
+  --form-group-tl: 0px;
+  --form-group-bl: 0px;
+}
+
+.form-group__row > :not(:last-child) {
+  --form-group-tr: 0px;
+  --form-group-br: 0px;
+}

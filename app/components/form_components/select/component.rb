@@ -45,7 +45,9 @@ module FormComponents
       end
 
       def select_classes
-        class_names("block w-full rounded-md bg-white py-1.5 pl-3 pr-10 text-base text-gray-900 outline outline-1 -outline-offset-1 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white",
+        class_names("block w-full bg-white py-1.5 pl-3 pr-10 text-base text-gray-900 outline outline-1 -outline-offset-1 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white",
+          corner_classes,
+          {"focus:relative" => grouped?, "relative" => grouped? && has_error?},
           {"outline-gray-300 focus:outline-primary-600 auto-dark:outline-white/10" => !has_error?},
           {"text-red-900 outline-red-300 focus:outline-red-600 auto-dark:text-red-300 auto-dark:outline-red-500/50" => has_error?})
       end

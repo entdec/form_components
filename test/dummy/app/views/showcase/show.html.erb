@@ -10,6 +10,18 @@
   <%= f.telephone_field :phone, description: "With its country's code" %>
   <%= f.country_field :country, description: "With flags" %>
   <%= f.money_field :price, currencies: %w[EUR USD GBP CHF], description: "With its currency" %>
+  <%= f.money_field :deposit, fixed_currency: true, description: "In euros, which can't be changed" %>
+  <%= f.field_group "Card details" do %>
+    <%= f.text_field :card_number, placeholder: "Card number", inputmode: "numeric", autocomplete: "cc-number" %>
+    <%= f.field_row do %>
+      <%= f.text_field :card_expiry, placeholder: "MM / YY", autocomplete: "cc-exp" %>
+      <%= f.text_field :card_cvc, placeholder: "CVC", inputmode: "numeric", autocomplete: "cc-csc" %>
+    <% end %>
+  <% end %>
+  <%= f.field_group "Billing address", description: "Fields in one box" do %>
+    <%= f.country_field :billing_country, priority_countries: %w[us nl] %>
+    <%= f.text_field :postal_code, placeholder: "ZIP / Postal code", autocomplete: "postal-code" %>
+  <% end %>
   <%= f.url_field :website %>
   <%= f.number_field :count, in: 1..10 %>
   <%= f.date_field :starts_on %>

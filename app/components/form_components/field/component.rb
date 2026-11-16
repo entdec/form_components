@@ -12,6 +12,29 @@ module FormComponents
       # The label for screen readers only, out of sight
       option_reader :hide_label, false
 
+      # Its corners: rounded, or in a field group those the group gives it,
+      # for the box's corners (field_group/component.css)
+      CORNERS = {
+        all: ["rounded-md", "rounded-tl-(--form-group-tl) rounded-tr-(--form-group-tr) rounded-br-(--form-group-br) rounded-bl-(--form-group-bl)"],
+        left: ["rounded-l-md", "rounded-tl-(--form-group-tl) rounded-bl-(--form-group-bl)"]
+      }.freeze
+
+      # In a field group (FormBuilder#field_group): its label for screen
+      # readers only, its description and errors below the group, its
+      # outline on its neighbours' and its corners the group's
+      def grouped?
+        form.respond_to?(:grouped_fields) && !form.grouped_fields.nil?
+      end
+
+      def before_render
+        form.grouped_fields << self if grouped?
+        super
+      end
+
+      def corner_classes(side = :all)
+        CORNERS.fetch(side)[grouped? ? 1 : 0]
+      end
+
       def has_error?
         all_errors.present?
       end
@@ -79,10 +102,11 @@ module FormComponents
         form.label(method, label.presence, {for: id, value: value}.compact.merge(label_options, more))
       end
 
-      # What the label gets of ours: sr-only with hide_label:, and whether it
+      # What the label gets of ours: sr-only with hide_label: or in a group,
+      # and whether it
       # says the input is required (required_in_label?)
       def label_options
-        {class: ("sr-only" if hide_label), required_text: (true if required_in_label?)}.compact
+        {class: ("sr-only" if hide_label || grouped?), required_text: (true if required_in_label?)}.compact
       end
     end
   end

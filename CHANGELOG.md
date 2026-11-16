@@ -1,6 +1,21 @@
 # Changelog
 
-## 0.1.6
+## 0.1.8
+
+- `money_field`: the currency is picked at the field's start, from a list as
+  the telephone field's countries (names in the locale, searched as typed,
+  `priority_currencies:` on top), instead of a select at its end, and sent in
+  Rails' hidden field. It's shown by its symbol, or by its code with
+  `currency_display: :code`, no longer as a symbol before the amount.
+  `currencies:` are codes, no longer a select's choices. `fixed_currency:
+  true` shows the currency without letting it be changed.
+- `field_group`: fields in one box, each below the one before or in a
+  `field_row` beside each other, with a legend, their labels for screen
+  readers only and their descriptions and errors below the box.
+- The country picker (`country_field/country_picker`) can pick other codes:
+  `namesType`, `icon` and `detailText`.
+
+## 0.1.7
 
 - `money_field`: an amount with its currency picked at its end and the
   currency's symbol before it, in one field, for money-rails' `monetize`.

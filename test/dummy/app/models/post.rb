@@ -20,6 +20,13 @@ class Post
   attribute :country, :string
   attribute :price, :string
   attribute :price_currency, :string
+  attribute :deposit, :string
+  attribute :deposit_currency, :string
+  attribute :card_number, :string
+  attribute :card_expiry, :string
+  attribute :card_cvc, :string
+  attribute :billing_country, :string
+  attribute :postal_code, :string
   attribute :website, :string
   attribute :count, :integer
   attribute :starts_on, :date

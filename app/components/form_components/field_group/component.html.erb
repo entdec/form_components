@@ -1,0 +1,19 @@
+<%= tag.fieldset(**fieldset_options) do %>
+  <% if legend.present? %>
+    <legend class="<%= FormComponents::Label::Component::CLASSES %>">
+      <%= legend %><% if required? %><span class="fas fa-asterisk fa-xs text-red-500 ml-1" aria-hidden="true"></span><% end %>
+    </legend>
+  <% end %>
+  <div class="<%= class_names("form-group__fields", "mt-2" => legend.present?) %>"><%= content %></div>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= description_id %>"><%= description %></p>
+  <% end %>
+  <% fields.each do |field| %>
+    <% if field.description.present? %>
+      <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= field.tag_id %>_description"><%= field.description %></p>
+    <% end %>
+    <% if field.has_error? %>
+      <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= field.tag_id %>_error"><%= field.all_errors.join(", ") %></p>
+    <% end %>
+  <% end %>
+<% end %>

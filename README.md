@@ -198,17 +198,23 @@ Rails doesn't get:
   and `.search`. Like the color field it needs JS; `text_field :phone, type: "tel"`
   is a plain one. `corner_hint:` as a text field.
 - **Money field**: `money_field`, for [money-rails](https://github.com/RubyMoney/money-rails)'
-  `monetize`: the amount in Rails' text field (`inputmode="decimal"`, a
-  placeholder of zero in the locale with the currency's decimals), the
-  currency's symbol before it and the currency in Rails' select at its end,
-  for `<attribute>_currency` (`currency_method:` another). `currencies:` are
-  the select's choices, all of the money gem's by default
-  (`FormComponents::MoneyField::Component.default_currencies`);
-  `default_currency:` (`"EUR"`, `.default_currency`) while the record has
-  none. The currency's errors show with the amount's. The symbols are the
-  money gem's, kept up to date by JS; without the gem there are none.
-  Translate `form_components.money_field.currency`, the select's name.
-  `corner_hint:` as a text field.
+  `monetize`: the currency picked at the field's start, from a list as the
+  telephone field's countries, with their names in `I18n.locale` (the
+  browser's), searched as typed, `priority_currencies:` (`%w[EUR USD GBP]`) on
+  top; then the amount in Rails' text field (`inputmode="decimal"`, a
+  placeholder of zero in the locale with the currency's decimals). The
+  currency is sent in Rails' hidden field for `<attribute>_currency`
+  (`currency_method:` another). It's shown by its symbol, the money gem's,
+  or with `currency_display: :code` by its code (one without a symbol always
+  by its code). `currencies:` are the codes to pick from, all of the money
+  gem's by default; `default_currency:` (`"EUR"`) while the record has none.
+  `fixed_currency: true` shows the currency without letting it be changed,
+  sent as it is. Set the defaults for the app with
+  `FormComponents::MoneyField::Component.default_currencies`,
+  `.default_priority_currencies`, `.default_currency` and
+  `.default_currency_display`. The currency's errors show with the amount's.
+  Translate `form_components.money_field.currency` and `.search`. Picking a
+  currency needs JS. `corner_hint:` as a text field.
 - **Country field**: `country_field` picks a country from the same list as
   the telephone field's, with flags and names in `I18n.locale` (the
   browser's), `priority_countries:` on top, and sends its ISO 3166 code in
@@ -280,6 +286,31 @@ It's not a field, so it renders in any form, too:
 A field with errors is wrapped as Rails wraps it
 (`ActionView::Base.field_error_proc`); in a component the wrapper takes no
 place (`.form-component .field_with_errors { display: contents }`).
+
+### Field groups
+
+`field_group` puts fields in one box, as a card's number, expiry and CVC, or
+a country and a postal code: a fieldset with the legend as their label, as
+Rails' `field_set_tag` (`legend`, `options`) with `description:`. Each field
+is below the one before, or in a `field_row` beside each other, their
+outlines on each other's, the box's corners rounded. The fields' labels are
+for screen readers only, so a placeholder shows what goes where; their
+descriptions and errors are below the box, with their ids, so they still
+describe their inputs. The legend is marked when one of them is required.
+
+```erb
+<%= f.field_group "Card details" do %>
+  <%= f.text_field :card_number, placeholder: "Card number" %>
+  <%= f.field_row do %>
+    <%= f.text_field :card_expiry, placeholder: "MM / YY" %>
+    <%= f.text_field :card_cvc, placeholder: "CVC" %>
+  <% end %>
+<% end %>
+```
+
+The text fields, text areas, selects, and the country, telephone and money
+fields can be in one. The box's corners are its first and last field's (or
+row's), so a hidden field goes outside it.
 
 ### The app's own components
 
