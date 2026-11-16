@@ -107,6 +107,18 @@ class CheckBoxTest < ComponentTest
     assert_select "input[type=checkbox][name='post[published]'][value='1'][checked]"
     assert_select "label[for=post_published]", text: "Published"
   end
+
+  test "as a switch: the same check box, a switch to assistive technology, over its track" do
+    post = Post.new(published: true)
+    html = Nokogiri::HTML5.fragment(form(post).check_box(:published, switch: true, description: "On the site"))
+
+    assert html.at_css("input[type=hidden][name='post[published]'][value='0']")
+    track = html.at_css(".group.rounded-full.has-checked\\:bg-primary-600")
+    assert track.at_css("input[type=checkbox][role=switch][name='post[published]'][value='1'][checked].appearance-none")
+    assert track.at_css("span.group-has-checked\\:translate-x-5")
+    assert html.at_css("label[for=post_published]", text: "Published")
+    assert_nil html.at_css("input[switch]")
+  end
 end
 
 class RadioButtonTest < ComponentTest

@@ -8,7 +8,7 @@ class ShowcaseController < ApplicationController
 
   def create
     @params = params.require(:post).permit!.to_h
-    @post = Post.new(@params.except("sections_attributes", "logo"))
+    @post = Post.new(@params.except("sections_attributes", "logo", "signature"))
     @post.validate
     render :show, status: (@post.errors.any? ? :unprocessable_content : :ok)
   end

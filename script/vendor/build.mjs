@@ -1,7 +1,7 @@
 // Bundles the components' third-party JavaScript into one ESM file each, so
 // importmap can pin them without chasing CDN chunk files: the rich text
 // area's Tiptap and Active Storage's DirectUpload, the code editor's
-// CodeMirror with its languages.
+// CodeMirror with its languages, the signature field's signature_pad.
 import { build } from "esbuild"
 import { readFileSync } from "node:fs"
 
@@ -35,6 +35,10 @@ const bundles = {
       'export { html } from "@codemirror/lang-html"',
       'export { css } from "@codemirror/lang-css"'
     ].join("\n")
+  },
+  "signature_pad.js": {
+    banner: `signature_pad ${version("signature_pad")} (MIT)`,
+    contents: 'export { default } from "signature_pad"'
   }
 }
 

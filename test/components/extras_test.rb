@@ -355,3 +355,30 @@ class CodeEditorTest < ComponentTest
     assert html.at_css("p#post_query_error")
   end
 end
+
+class SignatureFieldTest < ComponentTest
+  test "a pad labelled as the field, and Rails' file field for the SVG, out of sight" do
+    html = Nokogiri::HTML5.fragment(form.signature_field(:logo, width: 300, height: 100, description: "Sign here"))
+
+    assert html.at_css("[data-controller='form-components--signature-field'][data-form-components--signature-field-read-only-value=false]")
+    assert html.at_css("label#post_logo_label[for=post_logo_pad]", text: "Logo")
+    pad = html.at_css("div[style='width: 300px; aspect-ratio: 300 / 100'] canvas#post_logo_pad[role=img][aria-labelledby=post_logo_label][aria-describedby=post_logo_description]")
+    assert pad
+    assert html.at_css("input[type=file][name='post[logo]'][accept='image/svg+xml'].hidden[data-form-components--signature-field-target=file]:not([required])")
+    assert_equal 2, html.css("button[data-action^='form-components--signature-field#']").size
+    assert_nil html.at_css("img")
+    assert_nil html.at_css("input[name='post[remove_logo]']")
+  end
+
+  test "as Satis' signature, read-only without buttons, and a remove field when the record takes one" do
+    assert_includes form.signature(:logo), "form-components--signature-field"
+    assert_empty Nokogiri::HTML5.fragment(form.signature_field(:logo, disabled: true)).css("button")
+
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      attr_accessor :remove_logo
+    end
+    html = Nokogiri::HTML5.fragment(form(post_class.new).signature_field(:logo))
+    assert html.at_css("input[type=hidden][name='post[remove_logo]'][value='0'][data-form-components--signature-field-target=remove]")
+  end
+end

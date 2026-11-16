@@ -8,3 +8,5 @@ pin "form_components/jscolorpicker", to: "form_components/jscolorpicker/colorpic
 pin "form_components/tiptap", to: "form_components/tiptap.js"
 # CodeMirror and its languages, for the code editor; built by script/vendor/build.mjs
 pin "form_components/codemirror", to: "form_components/codemirror.js"
+# signature_pad, for the signature field; built by script/vendor/build.mjs
+pin "form_components/signature_pad", to: "form_components/signature_pad.js"

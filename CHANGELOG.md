@@ -22,6 +22,11 @@
   `height:`, as Satis' editor. CodeMirror is vendored
   (`vendor/javascript/form_components/codemirror.js`), loaded when the first
   editor shows.
+- `signature_field` (`signature`): a signature drawn with signature_pad
+  (vendored), sent as an SVG file for an Active Storage attachment, as
+  Satis' signature, with `width:` and `height:`.
+- `check_box`'s `switch: true` looks like a switch, as Satis' switch, still a
+  check box.
 
 ## 0.1.4
 

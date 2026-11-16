@@ -74,6 +74,13 @@ module FormComponents
     end
     alias_method :editor, :code_editor
 
+    # A signature drawn on a pad, sent as an SVG file for an Active Storage
+    # attachment, see SignatureField: width: and height: the pad's
+    def signature_field(method, options = {})
+      component(:signature_field, method, options)
+    end
+    alias_method :signature, :signature_field
+
     def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
       component(:check_box, method, options, checked_value, unchecked_value)
     end

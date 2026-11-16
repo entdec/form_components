@@ -160,6 +160,16 @@ Rails doesn't get:
   ```erb
   <%= f.code_editor :sql, lang: :sql, height: "24rem" %>
   ```
+- **Signature field**: `signature_field` (`signature`, as Satis') draws a
+  signature with [signature_pad](https://github.com/szimek/signature_pad)
+  (vendored) and sends it as an SVG file in Rails' file field, out of sight,
+  for an Active Storage attachment. `width:` and `height:` are the pad's size
+  (400 × 200), at most the field's width. The signature there shows under the
+  pad until a new one is drawn; undo and clear buttons, clear also removing
+  the signature there when the record takes `remove_<attribute>`. Serving
+  SVG as an image needs it out of Active Storage's
+  `content_types_to_serve_as_binary`. Translate the buttons' titles in
+  `form_components.signature_field` (`undo`, `clear`). It needs JS.
 - **Telephone field**: `telephone_field` (`phone_field`) takes Rails'
   arguments, with a country picker before the number: a flag and the
   country's calling code, and a list of countries to search, `priority_countries:`
@@ -175,7 +185,9 @@ Rails doesn't get:
   and `.search`. Like the color field it needs JS; `text_field :phone, type: "tel"`
   is a plain one. `corner_hint:` as a text field.
 - **Check boxes and radio buttons**: `check_box` (`checkbox`), with its hidden
-  unchecked value, `multiple:` and the rest as Rails; `radio_button`.
+  unchecked value, `multiple:` and the rest as Rails, and `switch: true` to
+  look like a switch (still the check box, with `role="switch"`, no JS);
+  `radio_button`.
 - **Collections**: `collection_check_boxes` and `collection_radio_buttons` in a
   fieldset, with the label as its legend and the description and errors once;
   `description_method:` (a method name or a proc, as `value_method`) gives each
@@ -318,8 +330,9 @@ with what it stores and how that renders.
 form builder and with this one, and compares their form controls.
 
 Tiptap, and Active Storage's `DirectUpload`, are vendored as one ES module,
-`vendor/javascript/form_components/tiptap.js`, and CodeMirror with its
-languages as another, `codemirror.js`. To update them:
+`vendor/javascript/form_components/tiptap.js`, CodeMirror with its
+languages as another, `codemirror.js`, and signature_pad as
+`signature_pad.js`. To update them:
 
 ```sh
 cd script/vendor && npm install && node build.mjs
@@ -329,4 +342,4 @@ cd script/vendor && npm install && node build.mjs
 
 MIT, see MIT-LICENSE. JS Color Picker is MIT too, see
 `vendor/javascript/form_components/jscolorpicker/LICENSE`, and so are the
-vendored Tiptap, Active Storage and CodeMirror JavaScript.
+vendored Tiptap, Active Storage, CodeMirror and signature_pad JavaScript.

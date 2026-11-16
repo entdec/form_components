@@ -23,6 +23,7 @@ class Post
   attribute :starts_at, :datetime
   attribute :color, :string
   attribute :published, :boolean
+  attribute :featured, :boolean
   attribute :kind, :string
   attribute :visibility, :string
   attribute :tags, default: -> { [] }
@@ -33,6 +34,7 @@ class Post
   attribute :rating, :integer
   attribute :score, :integer
   attribute :logo
+  attribute :signature
 
   validates :title, presence: true
   validates :color, format: {with: /\A#\h{6}\z/}, allow_blank: true

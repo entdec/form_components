@@ -1,0 +1,31 @@
+<%= tag.div class: "form-component", data: controller_data do %>
+  <%= field_label %>
+  <div class="mt-2 flex items-end gap-1">
+    <%= tag.div class: pad_classes, style: "width: #{width.to_i}px; aspect-ratio: #{width.to_i} / #{height.to_i}" do %>
+      <% if url %>
+        <%= image_tag url, alt: "", class: "absolute inset-0 size-full object-contain", data: {"form-components--signature-field-target": "image"} %>
+      <% end %>
+      <%= tag.canvas id: "#{tag_id}_pad", class: "absolute inset-0 size-full touch-none", role: "img",
+            "aria-labelledby": ("#{tag_id}_label" unless label == false), "aria-describedby": aria_described_by,
+            data: {"form-components--signature-field-target": "canvas"} %>
+    <% end %>
+    <% unless read_only? %>
+      <div class="flex flex-col gap-1">
+        <button type="button" class="<%= button_classes %>" title="<%= title(:undo) %>" aria-label="<%= title(:undo) %>" data-action="form-components--signature-field#undo">
+          <span class="fas fa-rotate-left" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="<%= button_classes %>" title="<%= title(:clear) %>" aria-label="<%= title(:clear) %>" data-action="form-components--signature-field#clear">
+          <span class="fas fa-trash" aria-hidden="true"></span>
+        </button>
+      </div>
+    <% end %>
+  </div>
+  <%= input %>
+  <%= remove_input %>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+<% end %>
