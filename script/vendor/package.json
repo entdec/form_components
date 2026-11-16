@@ -2,7 +2,7 @@
   "name": "form_components-vendor",
   "private": true,
   "type": "module",
-  "description": "Builds the single-file ESM bundles in vendor/javascript/form_components (tiptap.js, codemirror.js, signature_pad.js). Run: cd script/vendor && npm install && node build.mjs",
+  "description": "Builds the single-file ESM bundles in vendor/javascript/form_components (tiptap.js, codemirror.js, signature_pad.js) and the flags (app/assets/images/form_components/flags, flags.css). Run: cd script/vendor && npm install && node build.mjs",
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/lang-html": "^6.4.12",
@@ -24,6 +24,7 @@
     "@tiptap/starter-kit": "^3.34.0",
     "codemirror": "^6.0.2",
     "esbuild": "^0.25.0",
+    "flag-icons": "^7.6.0",
     "signature_pad": "^5.1.4"
   }
 }

@@ -17,6 +17,7 @@ class Post
   attribute :email, :string
   attribute :password, :string
   attribute :phone, :string
+  attribute :country, :string
   attribute :website, :string
   attribute :count, :integer
   attribute :starts_on, :date

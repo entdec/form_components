@@ -3,7 +3,7 @@
 // area's Tiptap and Active Storage's DirectUpload, the code editor's
 // CodeMirror with its languages, the signature field's signature_pad.
 import { build } from "esbuild"
-import { readFileSync } from "node:fs"
+import { copyFileSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
 
 const out = new URL("../../vendor/javascript/form_components/", import.meta.url).pathname
 const version = (name) => JSON.parse(readFileSync(new URL(`node_modules/${name}/package.json`, import.meta.url))).version
@@ -57,3 +57,20 @@ for (const [file, { banner, contents }] of Object.entries(bundles)) {
   })
   console.log(`wrote vendor/javascript/form_components/${file}`)
 }
+
+// flag-icons' flags (4:3), for the telephone and country fields: the SVGs as
+// the engine's images, and their classes (.fi .fi-nl) pointing at them, by a
+// path Propshaft resolves from the host's stylesheet
+const flags = new URL("node_modules/flag-icons/flags/4x3/", import.meta.url).pathname
+const images = new URL("../../app/assets/images/form_components/flags/", import.meta.url).pathname
+rmSync(images, { recursive: true, force: true })
+mkdirSync(images, { recursive: true })
+const codes = readdirSync(flags).filter((file) => file.endsWith(".svg")).map((file) => file.replace(/\.svg$/, "")).sort()
+for (const code of codes) copyFileSync(flags + code + ".svg", images + code + ".svg")
+writeFileSync(new URL("../../app/assets/stylesheets/form_components/flags.css", import.meta.url).pathname, [
+  `/* flag-icons ${version("flag-icons")} (MIT), its 4:3 flags. Built by script/vendor/build.mjs */`,
+  ".fi { position: relative; display: inline-block; width: 1.333333em; line-height: 1em; background-size: contain; background-position: 50%; background-repeat: no-repeat; }",
+  ".fi::before { content: \"\\00a0\"; }",
+  ...codes.map((code) => `.fi-${code} { background-image: url("form_components/flags/${code}.svg"); }`)
+].join("\n") + "\n")
+console.log(`wrote app/assets/images/form_components/flags (${codes.length}) and app/assets/stylesheets/form_components/flags.css`)

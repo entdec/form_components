@@ -55,6 +55,12 @@ module FormComponents
     end
     alias_method :phone_field, :telephone_field
 
+    # A country picked from a list with flags, sent as its ISO 3166 code
+    # ("NL"), see CountryField: priority_countries: those at the top
+    def country_field(method, options = {})
+      component(:country_field, method, options)
+    end
+
     def text_area(method, options = {})
       component(:text_area, method, options)
     end

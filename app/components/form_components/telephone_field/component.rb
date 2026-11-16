@@ -1,7 +1,7 @@
 module FormComponents
   module TelephoneField
     # A phone number with its country's calling code, picked from a list of
-    # countries with their flags (flag-icons, which the host provides), sent
+    # countries with their flags (flag-icons, flags.css), sent
     # as "+31123456789".
     #
     # The number is typed without its code, in Rails' telephone_field with its

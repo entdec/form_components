@@ -382,3 +382,42 @@ class SignatureFieldTest < ComponentTest
     assert html.at_css("input[type=hidden][name='post[remove_logo]'][value='0'][data-form-components--signature-field-target=remove]")
   end
 end
+
+class CountryFieldTest < ComponentTest
+  def field(country, **options)
+    Nokogiri::HTML5.fragment(form(Post.new(country: country)).country_field(:country, **options))
+  end
+
+  test "the code in capitals in Rails' hidden field, and the country with its flag on the button the label points at" do
+    html = field("nl", priority_countries: %w[be nl])
+
+    assert html.at_css("input[type=hidden][name='post[country]'][value=NL][data-form-components--country-field-target=value]")
+    assert html.at_css("label[for=post_country]", text: "Country")
+    assert html.at_css("button#post_country[aria-haspopup=listbox] .fi.fi-nl")
+    controller = html.at_css("[data-controller='form-components--country-field']")
+    assert_equal "nl", controller["data-form-components--country-field-country-value"]
+    assert_equal %w[be nl], JSON.parse(controller["data-form-components--country-field-priority-value"])
+    assert_includes JSON.parse(controller["data-form-components--country-field-countries-value"]), ["de", nil]
+    assert html.at_css("button[data-action='form-components--country-field#clear']:not([hidden])")
+  end
+
+  test "none, or one that isn't a country: the placeholder, nothing sent" do
+    [nil, "xx"].each do |code|
+      html = field(code, placeholder: "Pick one")
+      assert_nil html.at_css("input[type=hidden]")["value"]
+      assert html.at_css("button#post_country span", text: "Pick one")
+      assert html.at_css("button[data-action='form-components--country-field#clear'][hidden]")
+    end
+  end
+
+  test "required: no clearing" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :country, presence: true
+    end
+    html = Nokogiri::HTML5.fragment(form(post_class.new(country: "BE")).country_field(:country))
+
+    assert_nil html.at_css("button[data-action='form-components--country-field#clear']")
+    assert html.at_css("label[for=post_country] .fa-asterisk")
+  end
+end

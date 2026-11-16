@@ -50,9 +50,10 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
 
   or keep it off with `@custom-variant auto-dark (&:where(.never-dark, .never-dark *));`
 - [Font Awesome](https://fontawesome.com), for the icons (`fas`, `fal`).
-- [flag-icons](https://flagicons.lipis.dev), for the telephone field's
-  flags (`fi fi-nl`), e.g.
-  `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/css/flag-icons.min.css">`.
+- [Propshaft](https://github.com/rails/propshaft), which resolves the flags'
+  `url(form_components/flags/nl.svg)` in the stylesheet to the gem's images.
+  The flags are [flag-icons](https://flagicons.lipis.dev)' (4:3, vendored),
+  as `fi fi-nl`, also for the host's own use.
 
 ### Bundling with esbuild
 
@@ -61,8 +62,12 @@ Instead of the importmap, a bundler resolves these imports to the gem:
 - `form_components` to `app/javascript/form_components/application.js`
 - `form_components/components/<name>/component_controller` to
   `app/components/form_components/<name>/component_controller.js`
+- `form_components/components/<name>/<file>` (as `country_field/country_picker`)
+  to `app/components/form_components/<name>/<file>.js`
 - `form_components/jscolorpicker` to
-  `vendor/javascript/form_components/jscolorpicker/colorpicker.js`
+  `vendor/javascript/form_components/jscolorpicker/colorpicker.js`, and
+  `form_components/tiptap`, `form_components/codemirror` and
+  `form_components/signature_pad` to `vendor/javascript/form_components/<name>.js`
 
 ## Usage
 
@@ -184,6 +189,14 @@ Rails doesn't get:
   `.default_priority_countries`; translate `form_components.telephone_field.country`
   and `.search`. Like the color field it needs JS; `text_field :phone, type: "tel"`
   is a plain one. `corner_hint:` as a text field.
+- **Country field**: `country_field` picks a country from the same list as
+  the telephone field's, with flags and names in `I18n.locale` (the
+  browser's), `priority_countries:` on top, and sends its ISO 3166 code in
+  capitals (`NL`) in Rails' hidden field; a code in any case is read. Not
+  required, it can be cleared. `placeholder:` while there's none
+  (`form_components.country_field.placeholder`), and `.search`, `.clear`.
+  A code set on the hidden field by other JS, with a change event, is shown
+  as picked. It needs JS.
 - **Check boxes and radio buttons**: `check_box` (`checkbox`), with its hidden
   unchecked value, `multiple:` and the rest as Rails, and `switch: true` to
   look like a switch (still the check box, with `role="switch"`, no JS);
@@ -332,7 +345,9 @@ form builder and with this one, and compares their form controls.
 Tiptap, and Active Storage's `DirectUpload`, are vendored as one ES module,
 `vendor/javascript/form_components/tiptap.js`, CodeMirror with its
 languages as another, `codemirror.js`, and signature_pad as
-`signature_pad.js`. To update them:
+`signature_pad.js`; flag-icons' flags are copied into
+`app/assets/images/form_components/flags`, with their classes in
+`app/assets/stylesheets/form_components/flags.css`. To update them:
 
 ```sh
 cd script/vendor && npm install && node build.mjs
@@ -342,4 +357,5 @@ cd script/vendor && npm install && node build.mjs
 
 MIT, see MIT-LICENSE. JS Color Picker is MIT too, see
 `vendor/javascript/form_components/jscolorpicker/LICENSE`, and so are the
-vendored Tiptap, Active Storage, CodeMirror and signature_pad JavaScript.
+vendored Tiptap, Active Storage, CodeMirror and signature_pad JavaScript, and
+flag-icons' flags (`app/assets/images/form_components/flags/LICENSE`).

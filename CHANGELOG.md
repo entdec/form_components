@@ -27,6 +27,10 @@
   Satis' signature, with `width:` and `height:`.
 - `check_box`'s `switch: true` looks like a switch, as Satis' switch, still a
   check box.
+- flag-icons' flags are the gem's (vendored, 4:3, `fi fi-nl`): the host no
+  longer provides them.
+- `country_field`: a country picked from a list with flags and names, sent as
+  its ISO 3166 code (`NL`), the telephone field's picker.
 
 ## 0.1.4
 
