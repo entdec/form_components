@@ -165,11 +165,11 @@ Rails doesn't get:
   (vendored) and sends it as an SVG file in Rails' file field, out of sight,
   for an Active Storage attachment. `width:` and `height:` are the pad's size
   (400 × 200), at most the field's width. The signature there shows under the
-  pad until a new one is drawn; undo and clear buttons, clear also removing
+  pad until a new one is drawn; undo and clear in a menu (…), clear also removing
   the signature there when the record takes `remove_<attribute>`. Serving
   SVG as an image needs it out of Active Storage's
   `content_types_to_serve_as_binary`. Translate the buttons' titles in
-  `form_components.signature_field` (`undo`, `clear`). It needs JS.
+  `form_components.signature_field` (`more`, `undo`, `clear`). It needs JS.
 - **Telephone field**: `telephone_field` (`phone_field`) takes Rails'
   arguments, with a country picker before the number: a flag and the
   country's calling code, and a list of countries to search, `priority_countries:`

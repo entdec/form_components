@@ -365,7 +365,7 @@ class SignatureFieldTest < ComponentTest
     pad = html.at_css("div[style='width: 300px; aspect-ratio: 300 / 100'] canvas#post_logo_pad[role=img][aria-labelledby=post_logo_label][aria-describedby=post_logo_description]")
     assert pad
     assert html.at_css("input[type=file][name='post[logo]'][accept='image/svg+xml'].hidden[data-form-components--signature-field-target=file]:not([required])")
-    assert_equal 2, html.css("button[data-action^='form-components--signature-field#']").size
+    assert_equal 3, html.css("button[data-action^='form-components--signature-field#']").size
     assert_nil html.at_css("img")
     assert_nil html.at_css("input[name='post[remove_logo]']")
   end

@@ -4,9 +4,10 @@ import SignaturePad from "form_components/signature_pad"
 // A signature pad whose signature is the file field's file, as an SVG, with a
 // change event on it as choosing a file would. The signature there (the
 // image under the pad) stays until the first stroke, which starts a new one;
-// clear also removes it, when there is a remove field.
+// clear also removes it, when there is a remove field. Undo and clear are in
+// a menu, as an image upload's.
 export default class extends Controller {
-  static targets = ["canvas", "image", "file", "remove"]
+  static targets = ["canvas", "image", "file", "remove", "menu", "more"]
   static values = { readOnly: Boolean }
 
   connect() {
@@ -18,9 +19,15 @@ export default class extends Controller {
     // Again when its size changes, also from hidden (0 × 0) to shown
     this.resized = new ResizeObserver(() => this.resize())
     this.resized.observe(this.canvasTarget)
+    this.outside = (event) => { if (!this.element.contains(event.target)) this.close() }
+    this.escape = (event) => { if (event.key === "Escape") this.close() }
+    window.addEventListener("click", this.outside)
+    window.addEventListener("keydown", this.escape)
   }
 
   disconnect() {
+    window.removeEventListener("click", this.outside)
+    window.removeEventListener("keydown", this.escape)
     this.resized?.disconnect()
     this.pad?.off()
     this.pad = null
@@ -44,8 +51,25 @@ export default class extends Controller {
     this.pad.fromData(data)
   }
 
+  toggle() {
+    this.menuTarget.hidden ? this.open() : this.close()
+  }
+
+  open() {
+    this.menuTarget.hidden = false
+    this.moreTarget.setAttribute("aria-expanded", "true")
+  }
+
+  close() {
+    if (!this.hasMenuTarget) return
+
+    this.menuTarget.hidden = true
+    this.moreTarget.setAttribute("aria-expanded", "false")
+  }
+
   // Back to the signature there, when the pad is empty again
   undo() {
+    this.close()
     const data = this.pad.toData()
     data.pop()
     this.pad.fromData(data)
@@ -56,6 +80,7 @@ export default class extends Controller {
   }
 
   clear() {
+    this.close()
     this.pad.clear()
     if (this.hasImageTarget && !this.imageTarget.hidden && this.hasRemoveTarget) {
       this.hideImage()

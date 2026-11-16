@@ -1,6 +1,6 @@
 <%= tag.div class: "form-component", data: controller_data do %>
   <%= field_label %>
-  <div class="mt-2 flex items-end gap-1">
+  <div class="mt-2 flex items-center gap-2">
     <%= tag.div class: pad_classes, style: "width: #{width.to_i}px; aspect-ratio: #{width.to_i} / #{height.to_i}" do %>
       <% if url %>
         <%= image_tag url, alt: "", class: "absolute inset-0 size-full object-contain", data: {"form-components--signature-field-target": "image"} %>
@@ -10,13 +10,18 @@
             data: {"form-components--signature-field-target": "canvas"} %>
     <% end %>
     <% unless read_only? %>
-      <div class="flex flex-col gap-1">
-        <button type="button" class="<%= button_classes %>" title="<%= title(:undo) %>" aria-label="<%= title(:undo) %>" data-action="form-components--signature-field#undo">
-          <span class="fas fa-rotate-left" aria-hidden="true"></span>
+      <div class="relative">
+        <button type="button" class="<%= more_classes %>" title="<%= title(:more) %>" aria-label="<%= title(:more) %>" aria-haspopup="menu" aria-expanded="false" data-form-components--signature-field-target="more" data-action="form-components--signature-field#toggle">
+          <span class="fas fa-ellipsis" aria-hidden="true"></span>
         </button>
-        <button type="button" class="<%= button_classes %>" title="<%= title(:clear) %>" aria-label="<%= title(:clear) %>" data-action="form-components--signature-field#clear">
-          <span class="fas fa-trash" aria-hidden="true"></span>
-        </button>
+        <div class="absolute top-full left-0 z-20 mt-2 flex min-w-44 flex-col rounded-xl border border-gray-200 bg-white p-1 text-sm shadow-lg auto-dark:border-white/10 auto-dark:bg-gray-900" role="menu" hidden data-form-components--signature-field-target="menu">
+          <% {undo: "fal fa-arrow-rotate-left", clear: "fal fa-trash"}.each do |name, icon| %>
+            <button type="button" role="menuitem" class="<%= menu_item_classes %>" data-action="form-components--signature-field#<%= name %>">
+              <span class="<%= icon %> w-4 text-gray-500 auto-dark:text-gray-400" aria-hidden="true"></span>
+              <%= title(name) %>
+            </button>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

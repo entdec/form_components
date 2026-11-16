@@ -69,11 +69,16 @@ module FormComponents
           {"outline-red-300 auto-dark:outline-red-500/50" => has_error?})
       end
 
-      def button_classes
-        "flex size-7 items-center justify-center rounded-md text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900 auto-dark:text-gray-300 auto-dark:hover:bg-white/10 auto-dark:hover:text-white"
+      # The menu's button and items, as an image upload's
+      def more_classes
+        "flex size-10 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 aria-expanded:bg-gray-100 auto-dark:text-gray-300 auto-dark:hover:bg-white/10 auto-dark:aria-expanded:bg-white/10"
       end
 
-      def title(name) = I18n.t("form_components.signature_field.#{name}", default: name.to_s.humanize)
+      def menu_item_classes
+        "flex items-center gap-3 rounded-lg px-3 py-2 text-left text-gray-800 hover:bg-gray-100 auto-dark:text-gray-100 auto-dark:hover:bg-white/10"
+      end
+
+      def title(name) = I18n.t("form_components.signature_field.#{name}", default: {more: "More", undo: "Undo", clear: "Clear"}.fetch(name))
     end
   end
 end
