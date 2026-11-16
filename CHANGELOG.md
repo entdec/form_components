@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.1.6
 
+- `money_field`: an amount with its currency picked at its end and the
+  currency's symbol before it, in one field, for money-rails' `monetize`.
 - Accessibility, as the W3C's forms tutorial has it: an input is described by
   its errors and its description (both, no longer only the errors); a check
   box's, radio button's and collection item's description is a paragraph

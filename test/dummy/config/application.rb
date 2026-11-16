@@ -12,6 +12,7 @@ require "action_view/railtie"
 require "propshaft"
 require "turbo-rails"
 require "hotwire_combobox"
+require "money"
 require "form_components"
 
 module Dummy

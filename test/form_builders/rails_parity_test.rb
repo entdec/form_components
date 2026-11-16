@@ -208,6 +208,19 @@ class RailsParityTest < ComponentTest
     end
   end
 
+  test "money_field: Rails' text field for the amount, and Rails' select for its currency" do
+    post = Post.new(price: "12.50", price_currency: "USD")
+    [[{}, {}], [{placeholder: "x", data: {a: 1}, disabled: true}, {}], [{index: 3}, {}], [{id: "custom", name: "other[name]"}, {}], [{}, {namespace: "ns", index: 2}]].each do |options, form_options|
+      ours = controls(form(post, **form_options).money_field(:price, options.merge(EXTRAS, currencies: %w[EUR USD])))
+      amount = controls(rails_form(post, **form_options).text_field(:price, options)).first[1]
+      currency = controls(rails_form(post, **form_options).select(:price_currency, %w[EUR USD], {}, options.slice(:index, :disabled))).first[1]
+
+      assert_equal amount, ours.first[1].except("inputmode", "placeholder").merge(options.slice(:placeholder).transform_keys(&:to_s)), options.inspect
+      assert_equal "decimal", ours.first[1]["inputmode"]
+      assert_equal currency, ours.last[1].except("aria-label", "data-form-components--money-field-target", "data-action"), options.inspect
+    end
+  end
+
   test "fields_for gives nested fields Rails' names and ids" do
     post = Post.new(sections: [Section.new(title: "Intro")])
     ours = form(post).fields_for(:sections) { |sf| sf.text_field(:title) + sf.check_box(:title) }

@@ -61,6 +61,13 @@ module FormComponents
       component(:country_field, method, options)
     end
 
+    # An amount with its currency picked at its end, for money-rails'
+    # monetize, see MoneyField: currencies: to pick from, currency_method:
+    # the currency's attribute (<method>_currency)
+    def money_field(method, options = {})
+      component(:money_field, method, options)
+    end
+
     def text_area(method, options = {})
       component(:text_area, method, options)
     end

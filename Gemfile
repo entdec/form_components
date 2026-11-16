@@ -12,4 +12,6 @@ gem "standard"
 gem "propshaft"
 gem "puma"
 gem "hotwire_combobox"
+# The money field's symbols
+gem "money"
 gem "sqlite3"

@@ -197,6 +197,18 @@ Rails doesn't get:
   `.default_priority_countries`; translate `form_components.telephone_field.country`
   and `.search`. Like the color field it needs JS; `text_field :phone, type: "tel"`
   is a plain one. `corner_hint:` as a text field.
+- **Money field**: `money_field`, for [money-rails](https://github.com/RubyMoney/money-rails)'
+  `monetize`: the amount in Rails' text field (`inputmode="decimal"`, a
+  placeholder of zero in the locale with the currency's decimals), the
+  currency's symbol before it and the currency in Rails' select at its end,
+  for `<attribute>_currency` (`currency_method:` another). `currencies:` are
+  the select's choices, all of the money gem's by default
+  (`FormComponents::MoneyField::Component.default_currencies`);
+  `default_currency:` (`"EUR"`, `.default_currency`) while the record has
+  none. The currency's errors show with the amount's. The symbols are the
+  money gem's, kept up to date by JS; without the gem there are none.
+  Translate `form_components.money_field.currency`, the select's name.
+  `corner_hint:` as a text field.
 - **Country field**: `country_field` picks a country from the same list as
   the telephone field's, with flags and names in `I18n.locale` (the
   browser's), `priority_countries:` on top, and sends its ISO 3166 code in

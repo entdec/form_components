@@ -18,6 +18,8 @@ class Post
   attribute :password, :string
   attribute :phone, :string
   attribute :country, :string
+  attribute :price, :string
+  attribute :price_currency, :string
   attribute :website, :string
   attribute :count, :integer
   attribute :starts_on, :date

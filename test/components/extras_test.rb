@@ -225,6 +225,56 @@ class TelephoneFieldTest < ComponentTest
   end
 end
 
+class MoneyFieldTest < ComponentTest
+  def field(post = Post.new(price: "12.50", price_currency: "USD"), **options)
+    Nokogiri::HTML5.fragment(form(post).money_field(:price, **options))
+  end
+
+  test "the amount, the currency's symbol before it and the currency picked at its end" do
+    html = field(currencies: %w[EUR USD])
+
+    assert html.at_css("label[for=post_price]", text: "Price")
+    assert_equal "12.50", html.at_css("input#post_price[name='post[price]'][inputmode=decimal]")["value"]
+    assert_equal "0.00", html.at_css("input#post_price")["placeholder"]
+    assert html.at_css("select#post_price_currency[name='post[price_currency]'][aria-label=Currency] option[value=USD][selected]")
+    assert_equal "$", html.at_css("[data-form-components--money-field-target=symbol][aria-hidden=true]").text
+    assert_equal({"EUR" => "€", "USD" => "$"}, JSON.parse(html.at_css("[data-controller='form-components--money-field']")["data-form-components--money-field-symbols-value"]))
+  end
+
+  test "without a currency, the default one; choices as Rails' select's" do
+    html = field(Post.new, currencies: [["Euro", "EUR"], ["Yen", "JPY"]])
+    assert html.at_css("option[value=EUR][selected]", text: "Euro")
+    assert_equal "€", html.at_css("[data-form-components--money-field-target=symbol]").text
+
+    assert field(Post.new, currencies: %w[EUR JPY], default_currency: "jpy").at_css("option[value=JPY][selected]")
+    assert_equal "0", field(Post.new, currencies: %w[EUR JPY], default_currency: "JPY").at_css("input#post_price")["placeholder"]
+  end
+
+  test "all of the money gem's currencies, unless given" do
+    assert_operator field.css("select option").size, :>, 100
+  end
+
+  test "another attribute for the currency" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      attribute :currency, :string
+    end
+    html = field(post_class.new(currency: "GBP"), currencies: %w[EUR GBP], currency_method: :currency)
+    assert html.at_css("select[name='post[currency]'] option[value=GBP][selected]")
+  end
+
+  test "the currency's errors with the amount's" do
+    post = Post.new
+    post.errors.add(:price, "is not a number")
+    post.errors.add(:price_currency, "is not supported")
+    html = field(post, currencies: %w[EUR])
+
+    assert_equal "is not a number, is not supported", html.at_css("#post_price_error").text
+    assert html.at_css("input#post_price[aria-invalid=true][aria-describedby=post_price_error]")
+    assert html.at_css("select[aria-invalid=true]")
+  end
+end
+
 class RichTextAreaTest < ComponentTest
   def field(post = Post.new(notes: "<p>Hi</p>"), method = :notes, **options)
     Nokogiri::HTML5.fragment(form(post).rich_text_area(method, **options))
