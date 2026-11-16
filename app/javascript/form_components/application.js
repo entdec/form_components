@@ -7,10 +7,12 @@ import NestedFormController from "form_components/components/nested_form/compone
 import ColorFieldController from "form_components/components/color_field/component_controller"
 import TelephoneFieldController from "form_components/components/telephone_field/component_controller"
 import RichTextAreaController from "form_components/components/rich_text_area/component_controller"
+import DependsOnController from "form_components/components/select/depends_on_controller"
 
 export function registerFormComponents(application) {
   application.register("form-components--nested-form", NestedFormController)
   application.register("form-components--color-field", ColorFieldController)
   application.register("form-components--telephone-field", TelephoneFieldController)
   application.register("form-components--rich-text-area", RichTextAreaController)
+  application.register("form-components--depends-on", DependsOnController)
 }

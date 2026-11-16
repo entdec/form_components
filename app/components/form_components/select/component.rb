@@ -3,7 +3,18 @@ module FormComponents
     # Rails' select, or another of its kind (helper: :collection_select, …),
     # given the arguments Rails takes between method and options. Its arrow
     # is @tailwindcss/forms'.
+    #
+    # With depends_on: (a field of the same form, or several), its options
+    # depend on those fields' values: grouped choices whose groups say which
+    # values they're for, in an attribute named after the field, and only the
+    # groups that match are shown (by the controller):
+    #
+    #   <%= f.select :function, [["Players", [["Keeper", "keeper"]], {data: {role: "player"}}]], {}, depends_on: :role %>
+    #
+    # A group without the attribute of one of the fields is for any value of
+    # it.
     class Component < FormComponents::Field::Component
+      self.extras = superclass.extras + %i[depends_on]
       attr_reader :helper, :arguments, :select_html_options, :block
 
       # Our options can be in either hash
@@ -18,6 +29,14 @@ module FormComponents
 
       def input
         rails(helper, method, *arguments, html_options, input_options(select_classes, from: select_html_options), &block)
+      end
+
+      # Each field it depends on: its name in the form, and the attribute of
+      # the groups for its values
+      def depends_on_fields
+        Array(options[:depends_on]).map do |field|
+          {name: form.field_name(field, index: id_options.fetch(:index, form.options[:index])), attribute: "data-#{field.to_s.dasherize}"}
+        end
       end
 
       # Rails takes a select's id from its html_options

@@ -172,6 +172,19 @@ Rails doesn't get:
 - **Selects**: `select`, `collection_select`, `grouped_collection_select`,
   `time_zone_select` and `weekday_select`, as Rails'; the extras go in either
   hash, `options` or `html_options`. The arrow is `@tailwindcss/forms`'.
+  `depends_on:` (a field of the same form, or several) shows only the
+  option groups for those fields' values: each group says which values it's
+  for in an attribute named after the field (`data-role` for `:role`), and a
+  group without one is for any value. A choice that no longer fits is
+  cleared, the only option left chosen, each with a change event, so selects
+  can depend on each other in a chain. In a nested form a field is the
+  row's own. Without JS all groups show.
+
+  ```erb
+  <%= f.select :role, Member::ROLES %>
+  <%= f.select :function, [["Players", [["Keeper", "keeper"], …], {data: {role: "player"}}], …],
+        {include_blank: true}, depends_on: :role %>
+  ```
 - **Combobox**: `combobox`, [hotwire_combobox](https://hotwirecombobox.com)'s,
   when the host has that gem, with its arguments; our label replaces its own.
 - **Rating**: `rating_field` gives stars from 1 to `max:` (5), and

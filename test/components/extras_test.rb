@@ -104,6 +104,30 @@ class SelectTest < ComponentTest
     assert_select "p#mine_error", text: "can't be blank"
   end
 
+  test "options depending on other fields: the groups as given, and the fields for the controller" do
+    groups = [["Players", [["Keeper", "keeper"]], {data: {role: "player"}}], ["Staff", [["Doctor", "doctor"]], {data: {role: "staff", club_kind: "pro"}}]]
+    html = form.select(:category, groups, {include_blank: true}, depends_on: [:role, :club_kind])
+    fragment = Nokogiri::HTML5.fragment(html)
+
+    wrapper = fragment.at_css("[data-controller='form-components--depends-on']")
+    assert_equal [{"name" => "post[role]", "attribute" => "data-role"}, {"name" => "post[club_kind]", "attribute" => "data-club-kind"}],
+      JSON.parse(wrapper["data-form-components--depends-on-fields-value"])
+    assert wrapper.at_css("select[name='post[category]'] optgroup[label=Players][data-role=player] option[value=keeper]")
+    assert wrapper.at_css("optgroup[label=Staff][data-role=staff][data-club-kind=pro]")
+    assert_nil wrapper.at_css("select")["depends_on"]
+  end
+
+  test "depending on a field of the same row in a nested form" do
+    html = form.fields_for(:sections, Section.new, child_index: "NEW_RECORD", builder: FormComponents::FormBuilder) { |row| row.select(:title, [], {}, depends_on: :role) }
+    fields = JSON.parse(Nokogiri::HTML5.fragment(html).at_css("[data-form-components--depends-on-fields-value]")["data-form-components--depends-on-fields-value"])
+
+    assert_equal "post[sections_attributes][NEW_RECORD][role]", fields.first["name"]
+  end
+
+  test "a select depending on nothing has no controller" do
+    assert_not_includes form.select(:category, [["News"]]), "depends-on"
+  end
+
   test "a combobox under our label, its own hidden" do
     html = form.combobox(:city, Post::CITIES, label: "Where", description: "Type to filter")
     fragment = Nokogiri::HTML5.fragment(html)

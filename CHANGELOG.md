@@ -15,6 +15,9 @@
   (`FormComponents::Fieldset::Component`).
 - `FormComponents::FormBuilder.register(name) { |*args, **options| component }`
   adds a helper for one of the app's components.
+- A select's `depends_on:` (a field, or several) shows only the option groups
+  for those fields' values, named in an attribute after the field
+  (`{data: {role: "player"}}` for `depends_on: :role`), as Satis' `chain_to`.
 
 ## 0.1.4
 
