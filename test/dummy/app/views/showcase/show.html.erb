@@ -13,6 +13,7 @@
   <%= f.datetime_local_field :starts_at %>
   <%= f.text_area :body, rows: 3 %>
   <%= f.rich_text_area :notes, placeholder: "Write something…", description: "Tiptap, with images uploaded to Active Storage" %>
+  <%= f.code_editor :query, lang: :sql, height: "8rem", description: "CodeMirror" %>
   <%= f.check_box :published, description: "Shown on the site" %>
   <%= f.collection_radio_buttons :kind, Post::KINDS, :first, :second, description_method: :third, description: "One kind" %>
   <%= f.radio_button :visibility, "public", description: "Anyone can see it" %>

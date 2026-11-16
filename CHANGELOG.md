@@ -18,6 +18,10 @@
 - A select's `depends_on:` (a field, or several) shows only the option groups
   for those fields' values, named in an attribute after the field
   (`{data: {role: "player"}}` for `depends_on: :role`), as Satis' `chain_to`.
+- `code_editor` (`editor`): a CodeMirror editor for code, with `lang:` and
+  `height:`, as Satis' editor. CodeMirror is vendored
+  (`vendor/javascript/form_components/codemirror.js`), loaded when the first
+  editor shows.
 
 ## 0.1.4
 

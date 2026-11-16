@@ -1,0 +1,18 @@
+<%= tag.div class: "form-component", data: controller_data do %>
+  <% if label != false || corner_hint.present? %>
+    <div class="flex justify-between">
+      <%= field_label %>
+      <span class="text-sm/6 text-gray-500 auto-dark:text-gray-400"><%= corner_hint %></span>
+    </div>
+  <% end %>
+  <div class="<%= wrapper_classes %>">
+    <div data-form-components--code-editor-target="editor"></div>
+    <%= input %>
+  </div>
+  <% if description.present? %>
+    <p class="mt-2 text-sm text-gray-500 auto-dark:text-gray-400" id="<%= tag_id %>_description"><%= description %></p>
+  <% end %>
+  <% if has_error? %>
+    <p class="mt-2 text-sm text-red-600 auto-dark:text-red-400" id="<%= tag_id %>_error"><%= all_errors.join(", ") %></p>
+  <% end %>
+<% end %>

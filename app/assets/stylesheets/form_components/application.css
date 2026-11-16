@@ -1,4 +1,5 @@
 /* The components' styles (see app/assets/tailwind/form_components/engine.css) */
+@import "../../../components/form_components/code_editor/component.css";
 @import "../../../components/form_components/color_field/component.css";
 @import "../../../components/form_components/combobox/component.css";
 @import "../../../components/form_components/rich_text_area/component.css";

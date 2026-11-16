@@ -13,6 +13,7 @@ class Post
   attribute :title, :string
   attribute :body, :string
   attribute :notes, :string
+  attribute :query, :string
   attribute :email, :string
   attribute :password, :string
   attribute :phone, :string

@@ -1,6 +1,7 @@
-// Bundles the rich text area's third-party JavaScript, Tiptap and Active
-// Storage's DirectUpload, into one ESM file, so importmap can pin it without
-// chasing CDN chunk files.
+// Bundles the components' third-party JavaScript into one ESM file each, so
+// importmap can pin them without chasing CDN chunk files: the rich text
+// area's Tiptap and Active Storage's DirectUpload, the code editor's
+// CodeMirror with its languages.
 import { build } from "esbuild"
 import { readFileSync } from "node:fs"
 
@@ -17,6 +18,22 @@ const bundles = {
       'export { TextAlign } from "@tiptap/extension-text-align"',
       'export { Placeholder } from "@tiptap/extensions"',
       'export { DirectUpload } from "@rails/activestorage"'
+    ].join("\n")
+  },
+  "codemirror.js": {
+    banner: `codemirror ${version("codemirror")}, @codemirror/state, @codemirror/view and its languages (MIT)`,
+    contents: [
+      'export { basicSetup } from "codemirror"',
+      'export { EditorState } from "@codemirror/state"',
+      'export { EditorView } from "@codemirror/view"',
+      'export { sql } from "@codemirror/lang-sql"',
+      'export { json } from "@codemirror/lang-json"',
+      'export { yaml } from "@codemirror/lang-yaml"',
+      'export { liquid } from "@codemirror/lang-liquid"',
+      'export { markdown } from "@codemirror/lang-markdown"',
+      'export { javascript } from "@codemirror/lang-javascript"',
+      'export { html } from "@codemirror/lang-html"',
+      'export { css } from "@codemirror/lang-css"'
     ].join("\n")
   }
 }

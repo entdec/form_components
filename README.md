@@ -148,6 +148,18 @@ Rails doesn't get:
   color field it needs JS; `upload-error` is dispatched
   (`form-components--rich-text-area:upload-error`) when an upload fails, with
   an alert unless it's prevented.
+- **Code editor**: `code_editor` (`editor`, as Satis') is a
+  [CodeMirror](https://codemirror.net) editor (vendored) for code, with
+  `lang:` (`sql`, `json`, `yaml`, `liquid`, `markdown`, `javascript`, `html`,
+  `css`; none for plain text) and `height:` (CSS, `12rem` by default, or
+  `FormComponents::CodeEditor::Component.default_height`), scrolling beyond
+  it. The code is in Rails' text area, out of sight, as the rich text
+  area's; `readonly:` or `disabled:` make it read-only. CodeMirror is loaded
+  when the first editor shows. It needs JS.
+
+  ```erb
+  <%= f.code_editor :sql, lang: :sql, height: "24rem" %>
+  ```
 - **Telephone field**: `telephone_field` (`phone_field`) takes Rails'
   arguments, with a country picker before the number: a flag and the
   country's calling code, and a list of countries to search, `priority_countries:`
@@ -306,7 +318,8 @@ with what it stores and how that renders.
 form builder and with this one, and compares their form controls.
 
 Tiptap, and Active Storage's `DirectUpload`, are vendored as one ES module,
-`vendor/javascript/form_components/tiptap.js`. To update it:
+`vendor/javascript/form_components/tiptap.js`, and CodeMirror with its
+languages as another, `codemirror.js`. To update them:
 
 ```sh
 cd script/vendor && npm install && node build.mjs
@@ -316,4 +329,4 @@ cd script/vendor && npm install && node build.mjs
 
 MIT, see MIT-LICENSE. JS Color Picker is MIT too, see
 `vendor/javascript/form_components/jscolorpicker/LICENSE`, and so are the
-vendored Tiptap and Active Storage JavaScript.
+vendored Tiptap, Active Storage and CodeMirror JavaScript.

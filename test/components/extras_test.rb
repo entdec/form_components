@@ -314,3 +314,44 @@ class RichTextAreaTest < ComponentTest
     assert_includes article.content.to_plain_text, "Hi"
   end
 end
+
+class CodeEditorTest < ComponentTest
+  test "Rails' text area with the code, out of sight, for the controller to edit in CodeMirror" do
+    post = Post.new(query: "select 1")
+    html = Nokogiri::HTML5.fragment(form(post).code_editor(:query, lang: :sql, height: "20rem", description: "SQL"))
+
+    wrapper = html.at_css(".form-component[data-controller='form-components--code-editor']")
+    assert_equal "sql", wrapper["data-form-components--code-editor-lang-value"]
+    assert_equal "20rem", wrapper["data-form-components--code-editor-height-value"]
+    assert_equal "false", wrapper["data-form-components--code-editor-read-only-value"]
+    assert_equal({"id" => "post_query_editor", "aria-labelledby" => "post_query_label", "aria-describedby" => "post_query_description", "aria-invalid" => "false"},
+      JSON.parse(wrapper["data-form-components--code-editor-attributes-value"]))
+
+    textarea = html.at_css("textarea#post_query[name='post[query]'][tabindex='-1'][aria-hidden=true][data-form-components--code-editor-target=input]")
+    assert_equal "select 1", textarea.text.strip
+    assert html.at_css("label#post_query_label[for=post_query]")
+    assert html.at_css("p#post_query_description", text: "SQL")
+  end
+
+  test "as Satis' editor, read-only when readonly or disabled, and only its languages" do
+    assert_includes form.editor(:query), "form-components--code-editor"
+    assert_includes form.code_editor(:query, readonly: true), "data-form-components--code-editor-read-only-value=\"true\""
+    assert_includes form.code_editor(:query, disabled: true), "data-form-components--code-editor-read-only-value=\"true\""
+    assert_raises(ArgumentError) { form.code_editor(:query, lang: :cobol) }
+  end
+
+  test "its errors and required" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :query, presence: true
+    end
+    post = post_class.new
+    post.validate
+    html = Nokogiri::HTML5.fragment(form(post).code_editor(:query))
+
+    attributes = JSON.parse(html.at_css("[data-form-components--code-editor-attributes-value]")["data-form-components--code-editor-attributes-value"])
+    assert_equal ["true", "true", "post_query_error"], attributes.values_at("aria-required", "aria-invalid", "aria-describedby")
+    assert html.at_css("textarea[required]")
+    assert html.at_css("p#post_query_error")
+  end
+end

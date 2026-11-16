@@ -1,0 +1,48 @@
+/* The code editor (component.rb): CodeMirror in the field's frame, with the
+   field's colours, also dark */
+.form-code-editor .cm-editor {
+  font-size: var(--text-sm);
+  color: var(--color-gray-900);
+  background-color: transparent;
+
+  &.cm-focused {
+    outline: none;
+  }
+
+  & .cm-gutters {
+    border-right-color: var(--color-gray-200);
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-400);
+  }
+
+  & .cm-activeLineGutter {
+    background-color: var(--color-gray-100);
+    color: var(--color-gray-700);
+  }
+
+  @variant auto-dark {
+    color: white;
+    color-scheme: dark;
+
+    & .cm-gutters {
+      border-right-color: rgb(255 255 255 / 0.1);
+      background-color: rgb(255 255 255 / 0.05);
+      color: var(--color-gray-500);
+    }
+
+    & .cm-activeLine,
+    & .cm-activeLineGutter {
+      background-color: rgb(255 255 255 / 0.05);
+      color: var(--color-gray-300);
+    }
+
+    & .cm-cursor {
+      border-left-color: white;
+    }
+
+    & .cm-selectionBackground,
+    &.cm-focused .cm-selectionBackground {
+      background-color: rgb(255 255 255 / 0.15) !important;
+    }
+  }
+}

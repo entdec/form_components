@@ -67,6 +67,13 @@ module FormComponents
     end
     alias_method :rich_textarea, :rich_text_area
 
+    # A CodeMirror editor for code (SQL, JSON, YAML, Liquid, …), see
+    # CodeEditor: lang: its language, height: its height
+    def code_editor(method, options = {})
+      component(:code_editor, method, options)
+    end
+    alias_method :editor, :code_editor
+
     def check_box(method, options = {}, checked_value = "1", unchecked_value = "0")
       component(:check_box, method, options, checked_value, unchecked_value)
     end
