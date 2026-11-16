@@ -349,12 +349,40 @@ The fields follow the W3C's [forms tutorial](https://www.w3.org/WAI/tutorials/fo
 - The color picker's toggle and dialog are named, and its dialog opens with
   the focus on its hex field, for the keyboard; JS Color Picker puts the
   input in its button, which axe reports as nested controls.
+- The heading menu of the rich text area is a disclosure too: Enter opens it
+  with the focus on the current item, the arrow keys, Home and End move,
+  Escape closes it.
+- `error_summary` lists a form's errors, each a link to its field, and has
+  the focus when the page shows them.
 - Drawing a signature needs a pointer, as WCAG allows for a signature
   (2.1.1); offer another way to sign (a name typed, say) where that matters.
 
 What the host does: a `lang` on `<html>`, a page title that says when the
 form has errors, and a `primary` color with enough contrast (see
 [What the host provides](#what-the-host-provides)).
+
+Checked with axe-core in Chrome on the dummy app's page, and by the tests in
+`test/components/accessibility_test.rb`.
+
+Left to do:
+
+- Contrast of the controls' edges: inputs', check boxes' and radio buttons'
+  borders and a rating's stars not picked are gray-300, about 1.5:1 on
+  white, where WCAG asks 3:1 (1.4.11). Gray-400 or -500 would do, and look
+  heavier.
+- JS Color Picker's input in its button (nested controls): only a fork of
+  it, or a picker of our own, takes it out.
+- The dummy app's `primary` (a light green) hasn't the contrast it asks of
+  a host: its submit and add buttons fail.
+- axe again since the toolbar became Lucide's with a heading menu, and a
+  pass with a screen reader (VoiceOver) over the pickers, the editors and
+  the error summary; axe finds only part of what's wrong.
+- Whether Tab leaves the code editor, as it should, rather than indenting.
+- hotwire_combobox's `aria-controls`, which axe can't confirm (its markup,
+  not ours).
+- A system test that runs axe over the dummy app's page (as it is, with a
+  menu open, after a form that didn't save), for CI, once the contrast and
+  the color picker are settled or their rules left out.
 
 ### Nested forms
 
