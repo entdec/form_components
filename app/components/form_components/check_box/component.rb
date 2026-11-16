@@ -8,7 +8,8 @@ module FormComponents
       CLASSES = "col-start-1 row-start-1 size-4 appearance-none rounded border border-gray-300 bg-white auto-dark:border-white/10 auto-dark:bg-white/5 checked:border-primary-600 checked:hover:bg-primary-600 checked:bg-primary-600 indeterminate:border-primary-600 indeterminate:bg-primary-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto hover:ring-primary-600 focus:ring-primary-600 checked:focus:bg-primary-600"
 
       # The check box over the switch's track, out of sight but for its focus
-      SWITCH_CLASSES = "absolute inset-0 size-full cursor-pointer appearance-none rounded-full focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed forced-colors:appearance-auto"
+      # (also without @tailwindcss/forms' check box, its colour and checkmark)
+      SWITCH_CLASSES = "absolute inset-0 size-full cursor-pointer appearance-none rounded-full border-0 bg-transparent bg-none text-transparent shadow-none checked:bg-transparent checked:bg-none focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 disabled:cursor-not-allowed forced-colors:appearance-auto"
 
       attr_reader :checked_value, :unchecked_value
 
