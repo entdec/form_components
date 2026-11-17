@@ -7,5 +7,5 @@ jobs:
   build:
     uses: entdec/_workflows/.github/workflows/gem-push.yml@main
     with:
-      public: true
+      public: false
     secrets: inherit
