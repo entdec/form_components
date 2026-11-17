@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10
+
+- A form without a model (`form_with scope:`, whose object Rails makes
+  `false`) no longer fails on its fields' validators.
+
 ## 0.1.9
 
 - `combobox`: as wide and high as the other fields (36px, its text in the

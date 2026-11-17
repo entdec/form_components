@@ -22,6 +22,16 @@ class FormBuilderTest < ComponentTest
     assert builder.multipart
   end
 
+  test "a form without a model (form_with scope:, whose object is false)" do
+    html = vc_test_controller.view_context.form_with(scope: :search, url: "/search", builder: FormComponents::FormBuilder) do |f|
+      f.text_field(:query) + f.combobox(:city, Post::CITIES) + f.submit("Search")
+    end
+
+    assert_includes html, "name=\"search[query]\""
+    assert_includes html, "name=\"search[city]\""
+    assert_not_includes html, "fa-asterisk"
+  end
+
   test "the validation context decides what's required" do
     post_class = Class.new(Post) do
       def self.name = "Post"

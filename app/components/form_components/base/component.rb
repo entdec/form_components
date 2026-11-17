@@ -14,7 +14,8 @@ module FormComponents
 
       def initialize(form, object, method, options = {})
         @form = form
-        @object = object
+        # nil without a model: form_with(scope:) gives the builder false
+        @object = object || nil
         @method = method
         @options = (options || {}).symbolize_keys
       end
