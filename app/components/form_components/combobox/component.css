@@ -19,6 +19,43 @@
   }
 }
 
+/* As wide and high as the other fields (py-1.5, text-base, sm:text-sm/6):
+   its padding less its 1px border, and on focus that border and its ring
+   2px in the focus colour, as their outline. Through its variables, as its
+   own (unlayered) styles win over ours (in the components layer) */
+.form-component .hw-combobox {
+  width: 100%;
+  --hw-font-size: var(--text-base);
+
+  @variant sm {
+    --hw-font-size: var(--text-sm);
+  }
+}
+
+.form-component .hw-combobox__main__wrapper {
+  --hw-combobox-width: 100%;
+  --hw-padding--slim: calc(var(--spacing) * 1.5 - 1px);
+  --hw-padding--thick: calc(var(--spacing) * 3 - 1px);
+  --hw-border-width--thick: 1px;
+
+  &:focus-within {
+    --hw-border-color: var(--hw-focus-color);
+  }
+
+  &:has([aria-invalid="true"]) {
+    --hw-border-color: var(--color-red-300);
+
+    @variant auto-dark {
+      --hw-border-color: rgb(239 68 68 / 0.5);
+    }
+
+    &:focus-within {
+      --hw-border-color: var(--hw-invalid-color);
+      --hw-focus-color: var(--hw-invalid-color);
+    }
+  }
+}
+
 .form-component .hw-combobox__input,
 .form-component .hw-combobox__dialog__input {
   background-color: transparent;

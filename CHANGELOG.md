@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.9
+
+- `combobox`: as wide and high as the other fields (36px, its text in the
+  middle and as far in as theirs), text-base and sm:text-sm, and on focus a
+  2px ring in the focus colour as their outline, red-300 with an error.
+  Through hotwire_combobox's variables, as its unlayered styles win over the
+  components layer. A host app no longer needs its own sizes for it.
+
 ## 0.1.8
 
 - `money_field`: the currency is picked at the field's start, from a list as
