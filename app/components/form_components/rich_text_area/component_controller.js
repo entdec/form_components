@@ -3,14 +3,15 @@ import { DirectUpload, Editor, Image, Placeholder, StarterKit, TextAlign } from 
 
 // A Tiptap editor on the text area's HTML, which it keeps up to date ("" when
 // empty). The toolbar's buttons (component.rb) run their command and show
-// whether it's active. It allows only the formatting of the toolbar.
+// whether it's active. It allows only the formatting of the toolbar. The
+// toolbar keeps to one row: the groups that don't fit go into its More menu.
 //
 // Images are uploaded with Active Storage's direct uploads: shown at once,
 // and as the blob's URL when it's stored. For an Action Text attribute an
 // image is an attachment (<action-text-attachment sgid="…">). A form
 // submitted while images are uploading waits for them and then goes on.
 export default class extends Controller {
-  static targets = ["editor", "input", "toolbar", "button", "headingToggle", "headingMenu", "headingItem", "linkMenu", "linkInput", "file"]
+  static targets = ["editor", "input", "toolbar", "group", "button", "headingToggle", "headingMenu", "headingItem", "more", "moreToggle", "moreMenu", "moreGroup", "moreItem", "linkMenu", "linkInput", "file"]
   static values = {
     toolbar: Array,
     attributes: Object,
@@ -46,9 +47,15 @@ export default class extends Controller {
     this.submit = (event) => this.waitForUploads(event)
     this.form?.addEventListener("submit", this.submit)
     this.updateToolbar()
+    if (this.hasMoreTarget) {
+      this.resize = new ResizeObserver(() => this.fit())
+      this.resize.observe(this.toolbarTarget)
+      this.fit()
+    }
   }
 
   disconnect() {
+    this.resize?.disconnect()
     this.form?.removeEventListener("submit", this.submit)
     this.editor?.destroy()
     this.editor = null
@@ -121,6 +128,7 @@ export default class extends Controller {
 
   run(event) {
     const command = event.currentTarget.dataset.command
+    this.closeMore()
     const chain = () => this.editor.chain().focus()
     const commands = {
       bold: () => chain().toggleBold().run(),
@@ -151,6 +159,7 @@ export default class extends Controller {
   toggleHeadings(event) {
     if (!this.headingMenuTarget.hidden) return this.closeHeadings({ focus: false })
 
+    this.closeMore()
     this.headingMenuTarget.hidden = false
     this.headingToggleTarget.setAttribute("aria-expanded", "true")
     // From the keyboard (no click count), the focus to the current item
@@ -188,6 +197,86 @@ export default class extends Controller {
     level ? chain.setHeading({ level }).run() : chain.setParagraph().run()
   }
 
+  // The More menu: the toolbar's groups that don't fit on its row, from the
+  // end, but not the first (nor the heading menu's), their buttons with their
+  // names. Shown only then.
+
+  fit() {
+    const toolbar = this.toolbarTarget
+    const overflows = () => toolbar.scrollWidth > toolbar.clientWidth
+    const groups = this.groupTargets
+    for (const group of groups) group.hidden = false
+    this.moreTarget.hidden = true
+    if (overflows()) {
+      this.moreTarget.hidden = false
+      for (let index = groups.length - 1; index > 0 && overflows(); index--) {
+        if (!this.hasHeadingToggleTarget || !groups[index].contains(this.headingToggleTarget)) groups[index].hidden = true
+      }
+    }
+
+    const hidden = new Set(groups.filter((group) => group.hidden).map((group) => group.dataset.group))
+    let first = true
+    for (const group of this.moreGroupTargets) {
+      group.hidden = !hidden.has(group.dataset.group)
+      if (group.hidden) continue
+      group.querySelector("[data-more-separator]").hidden = first
+      first = false
+    }
+    if (hidden.size === 0) {
+      this.moreTarget.hidden = true
+      this.closeMore()
+    }
+    this.updateMoreToggle()
+    this.rove()
+  }
+
+  // The More menu's items that are shown, and can be used
+  moreItems() {
+    return this.moreItemTargets.filter((item) => !item.closest("[hidden]:not([data-form-components--rich-text-area-target=moreMenu])") && !item.disabled)
+  }
+
+  toggleMore(event) {
+    if (!this.moreMenuTarget.hidden) return this.closeMore()
+
+    this.closeHeadings()
+    this.moreMenuTarget.hidden = false
+    this.moreToggleTarget.setAttribute("aria-expanded", "true")
+    // From the keyboard (no click count), the focus to its first item
+    if (event.detail === 0) this.moreItems()[0]?.focus()
+  }
+
+  closeMore({ focus = false } = {}) {
+    if (!this.hasMoreMenuTarget || this.moreMenuTarget.hidden) return
+
+    this.moreMenuTarget.hidden = true
+    this.moreToggleTarget.setAttribute("aria-expanded", "false")
+    if (focus) this.moreToggleTarget.focus()
+  }
+
+  moreMenuKeydown(event) {
+    const items = this.moreItems()
+    const index = items.indexOf(event.target)
+    const next = { ArrowDown: index + 1, ArrowUp: index - 1, Home: 0, End: items.length - 1 }[event.key]
+    if (next !== undefined) {
+      event.preventDefault()
+      items[(next + items.length) % items.length]?.focus()
+    } else if (event.key === "Escape") {
+      event.preventDefault()
+      event.stopPropagation()
+      this.closeMore({ focus: true })
+    } else if (event.key === "Tab") {
+      this.closeMore()
+    }
+  }
+
+  // Marked while formatting of one of its items is on, as the heading menu's
+  updateMoreToggle() {
+    if (!this.hasMoreToggleTarget) return
+    const active = this.moreItems().some((item) => item.getAttribute("aria-pressed") === "true")
+    this.moreToggleTarget.toggleAttribute("data-active", active)
+    this.moreToggleTarget.disabled = this.disabledValue
+  }
+
   updateToolbar() {
     if (!this.editor) return
     const editor = this.editor
@@ -222,17 +311,19 @@ export default class extends Controller {
       this.headingToggleTarget.toggleAttribute("data-active", level > 0)
       this.headingToggleTarget.disabled = this.disabledValue
     }
+    this.updateMoreToggle()
     this.rove()
   }
 
   // The toolbar is one stop for Tab, its controls one after another with
   // the arrow keys, Home and End, as WAI-ARIA's toolbar pattern
 
-  // The toolbar's own controls, not the heading menu's items
+  // The toolbar's own controls that are shown, not its menus' items
   toolbarControls({ disabled = false } = {}) {
     if (!this.hasToolbarTarget) return []
     return [...this.toolbarTarget.querySelectorAll("button")]
-      .filter((control) => !this.headingItemTargets.includes(control) && (disabled || !control.disabled))
+      .filter((control) => !this.headingItemTargets.includes(control) && !this.moreItemTargets.includes(control) && !control.closest("[hidden]"))
+      .filter((control) => disabled || !control.disabled)
   }
 
   // The control that was last focused stays the toolbar's stop, unless it's
@@ -313,6 +404,7 @@ export default class extends Controller {
 
   clickOutside(event) {
     if (this.hasHeadingMenuTarget && !this.headingMenuTarget.parentElement.contains(event.target)) this.closeHeadings()
+    if (this.hasMoreTarget && !this.moreTarget.contains(event.target)) this.closeMore()
     if (this.hasLinkMenuTarget && !this.linkMenuTarget.contains(event.target) && !event.target.closest?.("[data-command=link]")) {
       this.closeLink({ focus: false })
     }

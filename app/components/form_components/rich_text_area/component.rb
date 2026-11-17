@@ -10,7 +10,8 @@ module FormComponents
     # editor. So like the color field it needs JS.
     #
     # toolbar: the buttons, as names from BUTTONS and :heading (a menu of
-    # paragraph and headings), with :| between groups; false for none. Their
+    # paragraph and headings), with :| between groups; false for none. It
+    # keeps to one row: the groups that don't fit go into a More menu. Their
     # icons are Lucide's (app/assets/images/form_components/icons). The
     # editor allows only the formatting they have, also when pasting or typing
     # Markdown. :image uploads an image with Active Storage's direct uploads,
@@ -74,6 +75,8 @@ module FormComponents
       def paragraph_label = I18n.t("form_components.rich_text_area.paragraph", default: "Paragraph")
 
       def toolbar_label = I18n.t("form_components.rich_text_area.toolbar", default: "Formatting")
+
+      def more_label = I18n.t("form_components.rich_text_area.more", default: "More formatting")
 
       def link_label = I18n.t("form_components.rich_text_area.url", default: "URL")
 
@@ -163,6 +166,11 @@ module FormComponents
       # when their formatting is on, the heading menu's while a heading is
       def button_classes
         "flex h-8 min-w-8 shrink-0 items-center justify-center gap-1.5 rounded-lg px-1.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary-600 disabled:pointer-events-none disabled:opacity-40 aria-expanded:bg-gray-100 aria-expanded:text-gray-900 aria-pressed:bg-primary-50 aria-pressed:text-primary-700 data-active:bg-primary-50 data-active:text-primary-700 auto-dark:text-gray-400 auto-dark:hover:bg-white/10 auto-dark:hover:text-white auto-dark:aria-expanded:bg-white/10 auto-dark:aria-expanded:text-white auto-dark:aria-pressed:bg-white/10 auto-dark:aria-pressed:text-white auto-dark:data-active:bg-white/10 auto-dark:data-active:text-white"
+      end
+
+      # A menu under its toolbar button (the heading menu, More's)
+      def menu_classes
+        "absolute top-full z-20 mt-1 flex flex-col rounded-xl bg-white p-1 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10"
       end
 
       def menu_item_classes

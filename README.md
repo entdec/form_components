@@ -146,7 +146,9 @@ Rails doesn't get:
   `%i[heading | bold italic underline strike | link | bullet_list ordered_list blockquote | image | undo redo]`,
   set for the app with `FormComponents::RichTextArea::Component.default_toolbar`.
   The editor allows only the formatting of its toolbar, also when pasting or
-  typing Markdown. `image` uploads an image, also a pasted or dropped one,
+  typing Markdown. The toolbar keeps to one row: when it doesn't fit, its
+  groups go from the end into a More menu (⋯), with their buttons' names,
+  all but the first group. `image` uploads an image, also a pasted or dropped one,
   with Active Storage's direct uploads, when the host has Active Storage (or
   as Rails takes them, `data: {direct_upload_url:, blob_url_template:}`); a
   form submitted while one uploads waits for it. On an Action Text attribute
@@ -155,8 +157,8 @@ Rails doesn't get:
   left out. `placeholder:` shows while it's empty, `class:` is the editor's
   and `corner_hint:` as a text area; translate the buttons' titles in
   `form_components.rich_text_area` (`bold`, `bullet_list`, …,
-  `heading_level`, `paragraph`, `url`, `apply`, `remove_link`, `add`, the
-  image button's text). The buttons are light, with Lucide's icons, as
+  `heading_level`, `paragraph`, `url`, `apply`, `remove_link`, `more` (More's
+  button), `add`, the image button's text). The buttons are light, with Lucide's icons, as
   Tiptap's own editor has them. Like the
   color field it needs JS; `upload-error` is dispatched
   (`form-components--rich-text-area:upload-error`) when an upload fails, with
@@ -386,7 +388,8 @@ The fields follow the W3C's [forms tutorial](https://www.w3.org/WAI/tutorials/fo
   name (`aria-label`, translatable).
 - The country lists are a combobox with a listbox (arrow keys, Enter,
   Escape); the rich text area's toolbar is one stop for Tab, its buttons one
-  after another with the arrow keys, Home and End; the signature field's menu
+  after another with the arrow keys, Home and End, its heading and More menus
+  with the arrow keys and Escape back to their button; the signature field's menu
   is a disclosure, and gives the focus back to its button; adding an item to
   a nested form focuses its first field, removing one the add button.
 - The color picker's toggle and dialog are named, and its dialog opens with

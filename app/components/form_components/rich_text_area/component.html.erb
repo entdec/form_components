@@ -7,36 +7,59 @@
   <% end %>
   <div class="<%= wrapper_classes %>">
     <% if toolbar.any? %>
-      <div class="flex flex-wrap items-center gap-0.5 border-b border-gray-200 px-2 py-1.5 auto-dark:border-white/10" role="toolbar" aria-label="<%= toolbar_label %>" aria-controls="<%= tag_id %>_editor" data-form-components--rich-text-area-target="toolbar" data-action="keydown->form-components--rich-text-area#toolbarKeydown">
+      <%# One row: the groups that don't fit (from the end, not the first) go into the More menu, see the controller.
+          Its width is its field's, not its buttons' (contain: inline-size), so a narrow field doesn't widen for them %>
+      <div class="flex flex-nowrap items-center [contain:inline-size] gap-0.5 border-b border-gray-200 px-2 py-1.5 auto-dark:border-white/10" role="toolbar" aria-label="<%= toolbar_label %>" aria-controls="<%= tag_id %>_editor" data-form-components--rich-text-area-target="toolbar" data-action="keydown->form-components--rich-text-area#toolbarKeydown">
         <% toolbar_groups.each_with_index do |group, index| %>
-          <% if index > 0 %>
-            <span class="mx-1.5 h-6 w-px bg-gray-200 auto-dark:bg-white/10" aria-hidden="true"></span>
-          <% end %>
-          <% group.each do |name| %>
-            <% if name == :heading %>
-              <div class="relative">
-                <button type="button" class="<%= button_classes %>" title="<%= title(:heading) %>" aria-label="<%= title(:heading) %>" aria-expanded="false" aria-controls="<%= tag_id %>_headings" data-form-components--rich-text-area-target="headingToggle" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#toggleHeadings">
-                  <%= icon("heading") %><%= icon("chevron-down", "-ml-1 size-3 shrink-0") %>
-                </button>
-                <div id="<%= tag_id %>_headings" class="absolute top-full left-0 z-20 mt-1 flex min-w-40 flex-col rounded-xl bg-white p-1 shadow-lg outline outline-1 outline-black/5 auto-dark:bg-gray-800 auto-dark:outline-white/10" hidden data-form-components--rich-text-area-target="headingMenu" data-action="keydown->form-components--rich-text-area#headingMenuKeydown">
-                  <% [0, *HEADING_LEVELS].each do |level| %>
-                    <button type="button" class="<%= menu_item_classes %>" aria-pressed="false" data-level="<%= level %>" data-form-components--rich-text-area-target="headingItem" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#heading">
-                      <%= icon(heading_icon(level), "size-4 shrink-0 text-gray-500 auto-dark:text-gray-400") %><%= level.zero? ? paragraph_label : heading_label(level) %>
-                    </button>
-                  <% end %>
-                </div>
-              </div>
-            <% elsif name == :image %>
-              <button type="button" class="<%= button_classes %> pr-2" title="<%= title(:image) %>" data-command="image" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
-                <%= icon(BUTTONS[:image]) %><span><%= add_image_label %><span class="sr-only"> <%= title(:image).downcase %></span></span>
-              </button>
-            <% else %>
-              <button type="button" class="<%= button_classes %>" title="<%= title(name) %>" aria-label="<%= title(name) %>" data-command="<%= name %>" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
-                <%= icon(BUTTONS[name]) %>
-              </button>
+          <div class="flex shrink-0 items-center gap-0.5" data-group="<%= index %>" data-form-components--rich-text-area-target="group">
+            <% if index > 0 %>
+              <span class="mx-1.5 h-6 w-px bg-gray-200 auto-dark:bg-white/10" aria-hidden="true"></span>
             <% end %>
-          <% end %>
+            <% group.each do |name| %>
+              <% if name == :heading %>
+                <div class="relative">
+                  <button type="button" class="<%= button_classes %>" title="<%= title(:heading) %>" aria-label="<%= title(:heading) %>" aria-expanded="false" aria-controls="<%= tag_id %>_headings" data-form-components--rich-text-area-target="headingToggle" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#toggleHeadings">
+                    <%= icon("heading") %><%= icon("chevron-down", "-ml-1 size-3 shrink-0") %>
+                  </button>
+                  <div id="<%= tag_id %>_headings" class="<%= menu_classes %> left-0 min-w-40" hidden data-form-components--rich-text-area-target="headingMenu" data-action="keydown->form-components--rich-text-area#headingMenuKeydown">
+                    <% [0, *HEADING_LEVELS].each do |level| %>
+                      <button type="button" class="<%= menu_item_classes %>" aria-pressed="false" data-level="<%= level %>" data-form-components--rich-text-area-target="headingItem" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#heading">
+                        <%= icon(heading_icon(level), "size-4 shrink-0 text-gray-500 auto-dark:text-gray-400") %><%= level.zero? ? paragraph_label : heading_label(level) %>
+                      </button>
+                    <% end %>
+                  </div>
+                </div>
+              <% elsif name == :image %>
+                <button type="button" class="<%= button_classes %> pr-2" title="<%= title(:image) %>" data-command="image" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
+                  <%= icon(BUTTONS[:image]) %><span><%= add_image_label %><span class="sr-only"> <%= title(:image).downcase %></span></span>
+                </button>
+              <% else %>
+                <button type="button" class="<%= button_classes %>" title="<%= title(name) %>" aria-label="<%= title(name) %>" data-command="<%= name %>" data-form-components--rich-text-area-target="button" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
+                  <%= icon(BUTTONS[name]) %>
+                </button>
+              <% end %>
+            <% end %>
+          </div>
         <% end %>
+        <%# The groups' buttons that don't fit, each with its name; the heading menu's group always fits, it's first %>
+        <div class="relative ml-auto shrink-0" hidden data-form-components--rich-text-area-target="more">
+          <button type="button" class="<%= button_classes %>" title="<%= more_label %>" aria-label="<%= more_label %>" aria-expanded="false" aria-controls="<%= tag_id %>_more" data-form-components--rich-text-area-target="moreToggle" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#toggleMore">
+            <%= icon("ellipsis") %>
+          </button>
+          <div id="<%= tag_id %>_more" class="<%= menu_classes %> right-0 min-w-48" hidden data-form-components--rich-text-area-target="moreMenu" data-action="keydown->form-components--rich-text-area#moreMenuKeydown">
+            <% toolbar_groups.each_with_index do |group, index| %>
+              <% next if group.include?(:heading) %>
+              <div class="flex flex-col" data-group="<%= index %>" data-form-components--rich-text-area-target="moreGroup">
+                <span class="mx-2.5 my-1 h-px bg-gray-200 auto-dark:bg-white/10" aria-hidden="true" data-more-separator></span>
+                <% group.each do |name| %>
+                  <button type="button" class="<%= menu_item_classes %>" data-command="<%= name %>" data-form-components--rich-text-area-target="button moreItem" data-action="mousedown->form-components--rich-text-area#keepFocus form-components--rich-text-area#run">
+                    <%= icon(BUTTONS[name], "size-4 shrink-0 text-gray-500 auto-dark:text-gray-400") %><%= title(name) %>
+                  </button>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
       </div>
     <% end %>
     <% if toolbar.include?(:link) %>

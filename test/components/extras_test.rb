@@ -374,22 +374,35 @@ class RichTextAreaTest < ComponentTest
     assert toggle
     assert_equal %w[0 1 2 3], html.css("#post_notes_headings[hidden] button[aria-pressed=false]").map { |item| item["data-level"] }
     assert_equal ["Paragraph", "Heading 1", "Heading 2", "Heading 3"], html.css("#post_notes_headings button").map { |item| item.text.strip }
-    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
+    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > button[data-command]").map { |button| button["data-command"] }
     # Lucide's icons, hidden from screen readers; the image button says "Add image"
-    assert_equal 11, html.css("[role=toolbar] button[data-command] > svg[aria-hidden=true][viewBox='0 0 24 24']").size
-    assert_equal "Add image", html.at_css("button[data-command=image]").text.squish
-    assert_nil html.at_css("button[data-command=image][aria-label]")
-    assert_equal 5, html.css("[role=toolbar] > span[aria-hidden]").size
+    assert_equal 11, html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > button[data-command] > svg[aria-hidden=true][viewBox='0 0 24 24']").size
+    assert_equal "Add image", html.at_css("[data-form-components--rich-text-area-target=group] > button[data-command=image]").text.squish
+    assert_nil html.at_css("[data-form-components--rich-text-area-target=group] > button[data-command=image][aria-label]")
+    assert_equal 5, html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > span[aria-hidden]").size
     assert_equal FormComponents::RichTextArea::Component.default_toolbar.without(:|).map(&:to_s), JSON.parse(data(html, "toolbar"))
     assert_equal "http://test.host/rails/active_storage/direct_uploads", data(html, "direct-upload-url")
     assert html.at_css("input[type=file][accept='image/*']")
   end
 
+  test "the toolbar's More menu, for the groups that don't fit: each but the heading menu's, its buttons with their names" do
+    html = field
+
+    more = html.at_css("[role=toolbar] > [data-form-components--rich-text-area-target=more][hidden]")
+    assert more.at_css("button[data-form-components--rich-text-area-target=moreToggle][aria-expanded=false][aria-controls=post_notes_more][aria-label='More formatting']")
+    menu = more.at_css("#post_notes_more[hidden]")
+    assert_equal %w[1 2 3 4 5], menu.css("[data-form-components--rich-text-area-target=moreGroup]").map { |group| group["data-group"] }
+    assert_equal %w[bold italic underline strike link bullet_list ordered_list blockquote image undo redo], menu.css("button[data-command]").map { |item| item["data-command"] }
+    assert_equal ["Bold", "Image"], menu.css("button[data-command=bold], button[data-command=image]").map { |item| item.text.squish }
+    # Its items are the buttons' too, which show whether their formatting is on
+    assert menu.css("button[data-command]").all? { |item| item["data-form-components--rich-text-area-target"] == "button moreItem" }
+  end
+
   test "a toolbar of its own, without separators at the ends or next to each other, or none" do
     html = field(toolbar: %i[| bold | | code_block align_center |])
 
-    assert_equal %w[bold code_block align_center], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
-    assert_equal 1, html.css("[role=toolbar] > span[aria-hidden]").size
+    assert_equal %w[bold code_block align_center], html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > button[data-command]").map { |button| button["data-command"] }
+    assert_equal 1, html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > span[aria-hidden]").size
     assert_nil html.at_css("[data-form-components--rich-text-area-target=linkMenu]")
     assert_nil field(toolbar: false).at_css("[role=toolbar]")
     assert_raises(ArgumentError) { field(toolbar: %i[bold blink]) }
@@ -398,7 +411,7 @@ class RichTextAreaTest < ComponentTest
   test "no image button nor uploads without a direct upload URL" do
     html = field(toolbar: %i[bold image], data: {direct_upload_url: nil})
 
-    assert_equal %w[bold], html.css("[role=toolbar] button[data-command]").map { |button| button["data-command"] }
+    assert_equal %w[bold], html.css("[role=toolbar] [data-form-components--rich-text-area-target=group] > button[data-command]").map { |button| button["data-command"] }
     assert_nil data(html, "direct-upload-url")
     assert_nil html.at_css("input[type=file]")
   end
