@@ -3,7 +3,7 @@
 # Every component on one page, and what the form sends back
 class ShowcaseController < ApplicationController
   def show
-    @post = Post.new(title: "Hello", kind: "news", tags: ["ruby"], color: "#1e40af", phone: "+31123456789", sections: [Section.new(title: "Intro")])
+    @post = Post.new(title: "Hello", kind: "news", tags: ["ruby"], color: "#1e40af", phone: "+31123456789", destinations: "Amsterdam,Utrecht", sections: [Section.new(title: "Intro")])
   end
 
   def create
@@ -11,5 +11,11 @@ class ShowcaseController < ApplicationController
     @post = Post.new(@params.except("sections_attributes", "logo", "signature"))
     @post.validate
     render :show, status: (@post.errors.any? ? :unprocessable_content : :ok)
+  end
+
+  # The chips of the destinations' combobox, for the cities picked
+  def chips
+    @cities = params[:combobox_values].to_s.split(",") & Post::CITIES
+    render formats: :turbo_stream
   end
 end

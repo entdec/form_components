@@ -40,6 +40,7 @@ class Post
   attribute :category, :string
   attribute :language, :string
   attribute :city, :string
+  attribute :destinations, :string
   attribute :time_zone, :string
   attribute :rating, :integer
   attribute :score, :integer

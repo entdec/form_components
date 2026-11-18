@@ -39,6 +39,7 @@
   <%= f.collection_select :language, Post::LANGUAGES, :first, :second, {prompt: "Pick a language"} %>
   <%= f.time_zone_select :time_zone, ActiveSupport::TimeZone.us_zones %>
   <%= f.combobox :city, Post::CITIES, description: "Type to filter" %>
+  <%= f.combobox :destinations, Post::CITIES, multiselect_chip_src: chips_path, label: "Destinations", description: "Pick as many as you like" %>
   <%= f.rating_field :rating, description: "How good is it?" %>
   <%= f.scale_field :score, in: 0..10, min_label: "Not likely", max_label: "Very likely", label: "How likely are you to recommend it?" %>
   <%= f.color_field :color, swatches: ["#e6007e", "#1e40af"], default: "#e6007e" %>

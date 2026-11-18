@@ -253,6 +253,15 @@ Rails doesn't get:
   ```
 - **Combobox**: `combobox`, [hotwire_combobox](https://hotwirecombobox.com)'s,
   when the host has that gem, with its arguments; our label replaces its own.
+  With `multiselect_chip_src:` it picks several, as chips, which it asks
+  that path for as a Turbo Stream (so the page needs Turbo, `window.Turbo`):
+  ```erb
+  <%= f.combobox :destinations, Trip::CITIES, multiselect_chip_src: chips_path %>
+  ```
+  ```erb
+  <%# chips.turbo_stream.erb, for params[:combobox_values], comma-separated %>
+  <%= combobox_selection_chips_for @cities, display: :itself, value: :itself %>
+  ```
 - **Rating**: `rating_field` gives stars from 1 to `max:` (5), and
   **scale**: `scale_field` a row of numbers, `in:` (1..5), with `min_label:`
   and `max_label:` at its ends. Both are Rails' `collection_radio_buttons` of

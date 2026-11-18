@@ -8,7 +8,7 @@ class ShowcaseTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_response :success
-    %w[post[title] post[email] post[body] post[notes] post[query] post[published] post[featured] post[kind] post[visibility] post[tags][] post[color] post[phone] post[country] post[price] post[price_currency] post[deposit] post[deposit_currency] post[card_number] post[card_expiry] post[card_cvc] post[billing_country] post[postal_code] post[logo] post[signature] post[category] post[language] post[time_zone] post[city] post[rating] post[score]].each do |name|
+    %w[post[title] post[email] post[body] post[notes] post[query] post[published] post[featured] post[kind] post[visibility] post[tags][] post[color] post[phone] post[country] post[price] post[price_currency] post[deposit] post[deposit_currency] post[card_number] post[card_expiry] post[card_cvc] post[billing_country] post[postal_code] post[logo] post[signature] post[category] post[language] post[time_zone] post[city] post[destinations] post[rating] post[score]].each do |name|
       assert_select "[name='#{name}']", {minimum: 1}, name
     end
     assert_select ".section-wrapper [data-action='form-components--nested-form#remove']", minimum: 1
@@ -22,5 +22,14 @@ class ShowcaseTest < ActionDispatch::IntegrationTest
     assert_select "pre", text: /"tags": \[\s*"",\s*"ruby",\s*"rails"\s*\]/
     assert_select "input#post_kind_blog[checked]"
     assert_select "input#post_tags_ruby[checked]"
+  end
+
+  test "the chips of the cities picked, for the multiselect combobox" do
+    post chips_path, params: {for_id: "post_destinations", combobox_values: "Amsterdam,Utrecht,Paris"}, as: :turbo_stream
+
+    assert_response :success
+    assert_select "turbo-stream[action=before][target=post_destinations]", 2
+    assert_select "turbo-stream template", text: /Amsterdam/
+    assert_select "turbo-stream template", text: /Paris/, count: 0
   end
 end

@@ -2,6 +2,11 @@
 
 ## 0.1.10
 
+- `combobox` with chips (hotwire_combobox's `multiselect_chip_src:`): as
+  wide as the other fields instead of 30rem, without the handle (focusing it
+  opens the list), its chips as far from its sides as from its top and
+  bottom, and its input beside the chips while there's room rather than on a
+  line of its own.
 - A form without a model (`form_with scope:`, whose object Rails makes
   `false`) no longer fails on its fields' validators.
 

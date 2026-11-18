@@ -70,6 +70,32 @@
   }
 }
 
+/* A combobox of chips (multiselect_chip_src:): as wide as the other fields,
+   not hotwire_combobox's 30rem, without its handle (focusing it opens the
+   list), and its input beside the chips while there's room: its least width
+   is half of --hw-combobox-width, which here is for nothing else (the 100%
+   above would put it on a line of its own) */
+.form-component .hw-combobox--multiple {
+  --hw-combobox-width--multiple: 100%;
+}
+
+/* Its chips as far from its sides as from its top and bottom: its padding is
+   thick on the left and the handle's width plus slimmer on the right */
+.form-component .hw-combobox--multiple .hw-combobox__main__wrapper {
+  --hw-combobox-width: 8rem;
+  --hw-padding--thick: var(--hw-padding--slim);
+  --hw-handle-width: calc(var(--hw-padding--slim) - var(--hw-padding--slimmer));
+}
+
+/* Its list's options inside it keep their own padding */
+.form-component .hw-combobox--multiple :is(.hw-combobox__listbox, .hw-combobox__dialog) {
+  --hw-padding--thick: calc(var(--spacing) * 3 - 1px);
+}
+
+.form-component .hw-combobox--multiple .hw-combobox__handle {
+  display: none;
+}
+
 /* On small screens it opens in a dialog */
 .form-component .hw-combobox__dialog {
   @variant auto-dark {
