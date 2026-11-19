@@ -351,7 +351,13 @@ its input gets `required`, for the browser to check, when the validator
 holds for the record as it is (its `if:` and `unless:`). Not for a check box
 that is one of several or of a collection, which would each have to be
 checked, nor for a file field, as a file there already isn't sent again.
-`required: false` leaves it out.
+`required: false` leaves both out, and `required: true` gives both without a
+validator (such as a nested record's field its parent requires).
+
+A field that can't be changed (`readonly:` or `disabled:`) isn't required,
+and looks it: on a tint with a dashed edge, a read-only one still focusable.
+`disabled:` takes it out of the tab order and isn't sent; `readonly:` is
+focused, read out and sent.
 
 Where the label is marked but the browser doesn't check it (a validator's
 `if:` that doesn't hold now), the input gets `aria-required="true"`, for
@@ -360,7 +366,8 @@ the signature pad, the country field's button) has "(required)" in its label
 for them (`form_components.required`), as has a collection's legend, unless
 each of its radio buttons is required.
 
-Pass the validation context to the form to count those `on:` it:
+Pass the validation context to the form to count those `on:` it too (those
+without `on:` count in every context, as Rails runs them):
 
 ```erb
 <%= form_with model: @post, builder: FormComponents::FormBuilder, validation_context: :publish do |f| %>

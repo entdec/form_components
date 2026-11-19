@@ -4,11 +4,18 @@ module FormComponents
     # asterisk, and with required_text: true also the word, for screen
     # readers, for an input that can't say it's required itself
     class Component < FormComponents::Base::Component
-      self.extras = %i[required_text]
+      self.extras = %i[required required_text]
 
       CLASSES = "block text-sm/6 font-medium text-gray-900 auto-dark:text-white"
 
       option_reader :required_text, false
+      # Given by its field (Field#required?), which knows better than the
+      # validators: whether it's locked, or required: was given
+      option_reader :required
+
+      def required?(context: validation_context)
+        required.nil? ? super : required
+      end
 
       attr_reader :text, :block
 

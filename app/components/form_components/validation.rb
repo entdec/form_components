@@ -26,13 +26,11 @@ module FormComponents
         validators(context: context).any? { |validator| validator.is_a?(ActiveModel::Validations::PresenceValidator) && applies?(validator) }
       end
 
+      # Those that run in the context: as Rails runs them, those without on:
+      # in every one
       def validators(context: validation_context)
         method_validators.select do |validator|
-          if context.nil?
-            validator.options[:on].blank?
-          else
-            Array(validator.options[:on]).include?(context&.to_sym)
-          end
+          validator.options[:on].blank? || (context.present? && Array(validator.options[:on]).include?(context.to_sym))
         end
       end
 

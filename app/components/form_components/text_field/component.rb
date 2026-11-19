@@ -23,7 +23,7 @@ module FormComponents
 
       def text_field_classes
         class_names("block w-full bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-500 focus:outline focus:outline-2 focus:-outline-offset-1 sm:text-sm/6 auto-dark:bg-white/5 auto-dark:text-white auto-dark:placeholder:text-gray-400",
-          corner_classes,
+          corner_classes, LOCKED_CLASSES,
           {"focus:relative" => grouped?, "relative" => grouped? && has_error?},
           {"col-start-1 row-start-1 pl-10 pr-3" => leading_icon.present?},
           {"col-start-1 row-start-1 pr-3" => has_error?},

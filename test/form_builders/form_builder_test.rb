@@ -42,6 +42,49 @@ class FormBuilderTest < ComponentTest
     assert_includes form(post_class.new, validation_context: :publish).label(:body), "fa-asterisk"
   end
 
+  test "a validation without on: holds in every context, as Rails runs it" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :title, presence: true
+    end
+
+    assert_includes form(post_class.new, validation_context: :publish).text_field(:title), "fa-asterisk"
+  end
+
+  test "required: decides over the validators, for the asterisk too" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :title, presence: true
+    end
+
+    html = form(Post.new).text_field(:body, required: true)
+    assert_includes html, "fa-asterisk"
+    assert required_attribute?(html)
+
+    html = form(post_class.new).text_field(:title, required: false)
+    assert_not_includes html, "fa-asterisk"
+    assert_not required_attribute?(html)
+  end
+
+  test "a field that can't be changed isn't required, and looks it" do
+    post_class = Class.new(Post) do
+      def self.name = "Post"
+      validates :title, :body, :kind, presence: true
+    end
+
+    {text_field: [:title, {readonly: true}], text_area: [:body, {disabled: true}]}.each do |helper, (method, options)|
+      html = form(post_class.new).public_send(helper, method, **options)
+      assert_not_includes html, "fa-asterisk", helper
+      assert_not required_attribute?(html), helper
+      assert_includes html, "read-only:outline-dashed", helper
+    end
+
+    html = form(post_class.new).select(:kind, Post::KINDS.map { it.first(2).reverse }, {}, disabled: true)
+    assert_not_includes html, "fa-asterisk"
+    assert_not required_attribute?(html)
+    assert_includes html, "disabled:outline-dashed"
+  end
+
   def required_attribute?(html) = Nokogiri::HTML5.fragment(html).css("[required]").any?
 
   test "an input the record must have filled in now is required, for the browser to check" do

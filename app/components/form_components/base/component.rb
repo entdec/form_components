@@ -31,8 +31,9 @@ module FormComponents
         options.except(*extras)
       end
 
-      # The options Rails takes the id, index: and name from: the options,
-      # or html_options for helpers that have both, such as select
+      # The options Rails takes the id, index: and name from, and the input's
+      # attributes (disabled:, required:, …): the options, or html_options for
+      # helpers that have both, such as select
       def id_options
         html_options
       end

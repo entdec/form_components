@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- `required: true` marks a field's label and gives its input `required`
+  without a presence validator; `required: false` takes the label's asterisk
+  away too.
+- A field that can't be changed (`readonly:` or `disabled:`) is no longer
+  required (no asterisk, no `required`), and looks it: text fields, text
+  areas and selects on a tint with a dashed edge.
+- With a validation context, validators without `on:` count too, as Rails
+  runs them: a field required in every context kept its asterisk only
+  without one.
+
 ## 0.1.10
 
 - `combobox` with chips (hotwire_combobox's `multiselect_chip_src:`): as

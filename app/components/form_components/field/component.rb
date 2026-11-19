@@ -61,6 +61,33 @@ module FormComponents
         has_error? ? "true" : "false"
       end
 
+      # A field that can't be changed (readonly: or disabled:): on a tint with
+      # a dashed edge, so it doesn't look like one to fill in; a read-only one
+      # can still be focused, and keeps its focus outline. :read-only is also
+      # a disabled input's (a select's always, so it takes disabled: instead)
+      LOCKED_CLASSES = "read-only:cursor-default read-only:bg-gray-100 read-only:outline-dashed read-only:focus:outline-solid auto-dark:read-only:bg-transparent"
+
+      # Shown, not to be filled in: then it's not required either
+      def locked?
+        id_options[:readonly].present? || id_options[:disabled].present?
+      end
+
+      # As the attribute's validators say, unless it's locked or required:
+      # (true or false) says otherwise; for its label's asterisk too
+      def required?(context: validation_context)
+        return false if locked?
+        return id_options[:required].present? unless id_options[:required].nil?
+
+        super
+      end
+
+      def required_now?(context: validation_context)
+        return false if locked?
+        return id_options[:required].present? unless id_options[:required].nil?
+
+        super
+      end
+
       # Whether the input gets the required attribute, for the browser to
       # check: when its attribute must be filled in now (required_now?)
       def required_attribute?
@@ -103,10 +130,10 @@ module FormComponents
       end
 
       # What the label gets of ours: sr-only with hide_label: or in a group,
-      # and whether it
-      # says the input is required (required_in_label?)
+      # whether the input is required (required?, for its asterisk), and
+      # whether it says so (required_in_label?)
       def label_options
-        {class: ("sr-only" if hide_label || grouped?), required_text: (true if required_in_label?)}.compact
+        {class: ("sr-only" if hide_label || grouped?), required: required?, required_text: (true if required_in_label?)}.compact
       end
     end
   end
