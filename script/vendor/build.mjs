@@ -72,7 +72,7 @@ writeFileSync(new URL("../../app/assets/stylesheets/form_components/flags.css", 
   `/* flag-icons ${version("flag-icons")} (MIT), its 4:3 flags. Built by script/vendor/build.mjs */`,
   ".fi { position: relative; display: inline-block; width: 1.333333em; line-height: 1em; background-size: contain; background-position: 50%; background-repeat: no-repeat; }",
   ".fi::before { content: \"\\00a0\"; }",
-  ...codes.map((code) => `.fi-${code} { background-image: url("form_components/flags/${code}.svg"); }`)
+  ...codes.map((code) => `.fi-${code} { background-image: url("/form_components/flags/${code}.svg"); }`)
 ].join("\n") + "\n")
 console.log(`wrote app/assets/images/form_components/flags (${codes.length}) and app/assets/stylesheets/form_components/flags.css`)
 

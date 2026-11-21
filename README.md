@@ -55,7 +55,7 @@ And include the styles in the host's Tailwind CSS (tailwindcss-rails v4), in
 - [Font Awesome](https://fontawesome.com), for the icons (`fas`, `fal`); the
   rich text area's toolbar has its own, [Lucide](https://lucide.dev)'s.
 - [Propshaft](https://github.com/rails/propshaft), which resolves the flags'
-  `url(form_components/flags/nl.svg)` in the stylesheet to the gem's images.
+  `url("/form_components/flags/nl.svg")` in the stylesheet to the gem's images.
   The flags are [flag-icons](https://flagicons.lipis.dev)' (4:3, vendored),
   as `fi fi-nl`, also for the host's own use.
 
