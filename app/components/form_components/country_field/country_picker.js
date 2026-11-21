@@ -38,7 +38,15 @@ export default class extends Controller {
   displayNames() {
     try {
       const names = new Intl.DisplayNames([this.localeValue || "en", "en"], { type: this.namesType })
-      return (iso) => names.of(iso.toUpperCase()) || iso.toUpperCase()
+      // of() throws a RangeError for a code that isn't well-formed (the
+      // money gem's "USDC"): that one goes by its code
+      return (iso) => {
+        try {
+          return names.of(iso.toUpperCase()) || iso.toUpperCase()
+        } catch {
+          return iso.toUpperCase()
+        }
+      }
     } catch {
       return (iso) => iso.toUpperCase()
     }

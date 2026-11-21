@@ -208,8 +208,9 @@ Rails doesn't get:
   currency is sent in Rails' hidden field for `<attribute>_currency`
   (`currency_method:` another). It's shown by its symbol, the money gem's,
   or with `currency_display: :code` by its code (one without a symbol always
-  by its code). `currencies:` are the codes to pick from, all of the money
-  gem's by default; `default_currency:` (`"EUR"`) while the record has none.
+  by its code). `currencies:` are the codes to pick from, the money gem's ISO
+  4217 ones by default (not BTC or USDC); `default_currency:` (`"EUR"`)
+  while the record has none.
   `fixed_currency: true` shows the currency without letting it be changed,
   sent as it is. Set the defaults for the app with
   `FormComponents::MoneyField::Component.default_currencies`,

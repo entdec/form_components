@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- `money_field` offers the money gem's ISO 4217 currencies by default, not
+  its others (BTC, USDC): USDC's four letters made the browser's names for
+  them throw, which left the list empty. A code without a name in the
+  browser goes by its code, in the currency and country pickers.
+
 - `required: true` marks a field's label and gives its input `required`
   without a presence validator; `required: false` takes the label's asterisk
   away too.

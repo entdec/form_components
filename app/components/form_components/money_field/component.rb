@@ -20,8 +20,8 @@ module FormComponents
 
       # The currency when the record has none
       class_attribute :default_currency, default: "EUR"
-      # The currencies to pick from, by their codes; nil for all of the money
-      # gem's, else these
+      # The currencies to pick from, by their codes; nil for the money gem's
+      # ISO 4217 ones (not its others: BTC, USDC), else these
       class_attribute :default_currencies, default: nil
       # The currencies at the top of the list
       class_attribute :default_priority_currencies, default: %w[EUR USD GBP]
@@ -43,7 +43,13 @@ module FormComponents
 
       def currencies
         options[:currencies] || self.class.default_currencies ||
-          (defined?(Money::Currency) ? Money::Currency.all.map(&:iso_code) : %w[EUR USD GBP])
+          (defined?(Money::Currency) ? iso_currencies : %w[EUR USD GBP])
+      end
+
+      # The money gem's currencies with an ISO 4217 number: not its others
+      # (BTC, USDC), nor its old entries (:yen for JPY)
+      def iso_currencies
+        Money::Currency.all.select { |currency| currency.iso_numeric.present? }.map(&:iso_code).uniq
       end
 
       # The codes to pick from, with the record's, also when it isn't one of

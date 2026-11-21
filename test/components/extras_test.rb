@@ -260,6 +260,14 @@ class MoneyFieldTest < ComponentTest
     assert_equal %w[eur usd], picker(field(currencies: %w[EUR]), "countries").map(&:first)
   end
 
+  test "without currencies, the money gem's ISO ones: not BTC or USDC, JPY once" do
+    codes = picker(field, "countries").map(&:first)
+
+    assert_includes codes, "eur"
+    assert_equal 1, codes.count("jpy")
+    assert_empty codes & %w[btc usdc]
+  end
+
   test "a fixed currency: shown, describing the amount, and sent in a hidden field" do
     html = field(fixed_currency: true, description: "Excluding VAT")
 
