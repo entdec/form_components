@@ -9,11 +9,11 @@ import SignaturePad from "form_components/signature_pad"
 // it closes with the focus in it.
 export default class extends Controller {
   static targets = ["canvas", "image", "file", "remove", "menu", "more"]
-  static values = { readOnly: Boolean }
+  static values = { readOnly: Boolean, penColor: { type: String, default: "#111827" } }
 
   connect() {
     this.size()
-    this.pad = new SignaturePad(this.canvasTarget, { penColor: "#111827" })
+    this.pad = new SignaturePad(this.canvasTarget, { penColor: this.penColorValue })
     this.pad.addEventListener("beginStroke", () => this.hideImage())
     this.pad.addEventListener("endStroke", () => this.save())
     if (this.readOnlyValue) this.pad.off()

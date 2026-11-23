@@ -3,7 +3,7 @@
   <div class="mt-2 flex items-center gap-2">
     <%= tag.div class: pad_classes, style: "width: #{width.to_i}px; aspect-ratio: #{width.to_i} / #{height.to_i}" do %>
       <% if url %>
-        <%= image_tag url, alt: "", class: "absolute inset-0 size-full object-contain", data: {"form-components--signature-field-target": "image"} %>
+        <%= tag.div class: "absolute inset-0 size-full", style: image_style, "aria-hidden": "true", data: {"form-components--signature-field-target": "image"} %>
       <% end %>
       <%= tag.canvas id: "#{tag_id}_pad", class: "absolute inset-0 size-full touch-none", role: "img",
             "aria-labelledby": ("#{tag_id}_label" unless label == false), "aria-describedby": aria_described_by,

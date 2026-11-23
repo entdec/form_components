@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- `signature_field` takes `pen_color:` (`#111827` by default): the pad
+  draws in it, and the signature there shows in it too, whatever colour it
+  was drawn in, as a mask over the colour instead of an image.
 - `money_field` offers the money gem's ISO 4217 currencies by default, not
   its others (BTC, USDC): USDC's four letters made the browser's names for
   them throw, which left the list empty. A code without a name in the

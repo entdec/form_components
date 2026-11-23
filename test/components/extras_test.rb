@@ -524,6 +524,13 @@ class SignatureFieldTest < ComponentTest
     assert_nil html.at_css("input[name='post[remove_logo]']")
   end
 
+  test "draws in its pen colour, #111827 unless given" do
+    assert Nokogiri::HTML5.fragment(form.signature_field(:logo)).at_css("[data-form-components--signature-field-pen-color-value='#111827']")
+    html = Nokogiri::HTML5.fragment(form.signature_field(:logo, pen_color: "#0013de"))
+    assert html.at_css("[data-form-components--signature-field-pen-color-value='#0013de']")
+    assert_nil html.at_css("canvas[pen_color], canvas[pen-color]"), "an option, not an attribute"
+  end
+
   test "as Satis' signature, read-only without buttons, and a remove field when the record takes one" do
     assert_includes form.signature(:logo), "form-components--signature-field"
     assert_empty Nokogiri::HTML5.fragment(form.signature_field(:logo, disabled: true)).css("button")

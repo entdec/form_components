@@ -13,12 +13,15 @@ module FormComponents
     # content_types_to_serve_as_binary.
     #
     # width: and height: the pad's size in pixels (400 × 200), its width at
-    # most the field's.
+    # most the field's. pen_color: the colour it draws in (#111827), and the
+    # one the signature there shows in, whatever colour it was drawn in (its
+    # shape as a mask over the colour).
     class Component < FormComponents::Field::Component
-      self.extras = superclass.extras + %i[width height]
+      self.extras = superclass.extras + %i[width height pen_color]
 
       option_reader :width, 400
       option_reader :height, 200
+      option_reader :pen_color, "#111827"
 
       # Not for a signature there is already, which isn't sent again
       def required_attribute? = false
@@ -33,6 +36,12 @@ module FormComponents
       # The signature there is, to show on the pad
       def url
         helpers.main_app.url_for(attachment) if attachment.respond_to?(:attached?) && attachment.attached? && attachment.blob.persisted?
+      end
+
+      # The signature there in the pen's colour
+      def image_style
+        mask = "url('#{url}') center / contain no-repeat"
+        "background-color: #{pen_color}; mask: #{mask}; -webkit-mask: #{mask}"
       end
 
       def removable?
@@ -60,7 +69,8 @@ module FormComponents
       def controller_data
         {
           controller: "form-components--signature-field",
-          "form-components--signature-field-read-only-value": read_only?.to_s
+          "form-components--signature-field-read-only-value": read_only?.to_s,
+          "form-components--signature-field-pen-color-value": pen_color
         }
       end
 
